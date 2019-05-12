@@ -1,1 +1,1 @@
-# flashggPlugins
+# MyFlashggPlugins

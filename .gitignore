@@ -1,32 +1,25 @@
-# Prerequisites
-*.d
 
-# Compiled Object files
-*.slo
-*.lo
+# General C++ exclusion
 *.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
 *.so
-*.dylib
-*.dll
 
-# Fortran module files
-*.mod
-*.smod
+# General Python exclusion
+*.pyc
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Swap files
+*.swp
 
-# Executables
-*.exe
-*.out
-*.app
+# General data file exclusions
+*.txt
+*.root
+*.log
+log*
+.remote-sync.json
+
+# Specific file exclusion
+# [relative/path/to/file]
+
+python/__init__.py
+
+# Specific file inclusion
+# ![relative/path/to/file]
