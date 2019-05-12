@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import importlib
 
 def getDiPhotonSystematicsList():
 
@@ -73,12 +74,58 @@ def includeScale(process):
     process.flashggDiPhotonSystematics.SystMethods = customizeVPSetForData(process.flashggDiPhotonSystematics.SystMethods, photonScaleBinsData)
     process.flashggDiPhotonSystematics.SystMethods2D = customizeVPSetForData(process.flashggDiPhotonSystematics.SystMethods2D, photonScaleBinsData)
 
-def prepareflashggDiPhotonSystematicsTask(process, processType, doSystematics = False):
+def prepareflashggDiPhotonSystematicsTask(process, processType, doSystematics = False, year = '2016'):
 
     from flashgg.Systematics.SystematicsCustomize import useEGMTools
     process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
     process.flashggPreselectedDiPhotons.src = cms.InputTag('flashggDiPhotonSystematics')
 
+    if year == '2016':
+        process.load("flashgg.Systematics.flashggDiPhotonSystematics2016_cfi")
+        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2016_cfi")
+    elif year == '2017':
+        process.load("flashgg.Systematics.flashggDiPhotonSystematics2017_cfi")
+        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2017_cfi")
+    else:
+        process.load("flashgg.Systematics.flashggDiPhotonSystematics2018_cfi")
+        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2018_cfi")
+        
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleHighR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleLowR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleHighR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleLowR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleGain6EB_EGM)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleGain1EB_EGM)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MaterialCentralBarrel)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MaterialOuterBarrel)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MaterialForward)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.ShowerShapeHighR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.ShowerShapeHighR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.ShowerShapeLowR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.ShowerShapeLowR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FNUFEB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FNUFEE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCSmearHighR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCSmearLowR9EE)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCSmearHighR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCSmearLowR9EB)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MvaShift)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.PreselSF)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.electronVetoSF)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.TriggerWeight)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.LooseMvaSF)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverEShift)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverESmearing)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVWeight)
+    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVNvtxWeight)
+
+#    print 'point1'
+#    for pset in process.flashggDiPhotonSystematics.SystMethods:
+#        print "=== 1D syst method pset ==="
+#        print pset
+#        print
+#    print 'point2'
+    
     SystTask = cms.Task(process.flashggDiPhotonSystematics)
 
     useEGMTools(process)
