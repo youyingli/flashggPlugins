@@ -359,7 +359,13 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_PtRaw                         .emplace_back( it_jet->correctedJet( "Uncorrected" ).pt() );
             dataformat.jets_QGL                           .emplace_back( it_jet->QGL() );
             dataformat.jets_RMS                           .emplace_back( it_jet->rms() );
-            dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
+	    dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
+	    if (diphotonPtrs.size() > 0) 
+	      {		
+		 dataformat.jets_passesPuJetIdLoose       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kLoose ) );
+		 dataformat.jets_passesPuJetIdMedium      .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kMedium ) );
+		 dataformat.jets_passesPuJetIdTight       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kTight ) );
+	      }	   
             dataformat.jets_GenJetMatch                   .emplace_back( it_jet->hasGenMatch() );
             dataformat.jets_pfCombinedInclusiveSecondaryVertexV2BJetTags        
                                                           .emplace_back( it_jet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ) );

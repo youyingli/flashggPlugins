@@ -134,6 +134,9 @@ class flashggAnalysisTreeFormatStd
         std::vector<float> jets_QGL                                           ;
         std::vector<float> jets_RMS                                           ;
         std::vector<float> jets_puJetIdMVA                                    ;
+        std::vector<bool>  jets_passesPuJetIdLoose                            ;
+        std::vector<bool>  jets_passesPuJetIdMedium                           ;
+        std::vector<bool>  jets_passesPuJetIdTight                            ;
         std::vector<bool>  jets_GenJetMatch                                   ;
         std::vector<float> jets_pfCombinedInclusiveSecondaryVertexV2BJetTags  ; 
         std::vector<float> jets_pfCombinedMVAV2BJetTags                       ; 
@@ -325,7 +328,10 @@ class flashggAnalysisTreeFormatStd
             jets_PtRaw                                        .clear(); 
             jets_QGL                                          .clear(); 
             jets_RMS                                          .clear(); 
-            jets_puJetIdMVA                                   .clear(); 
+            jets_puJetIdMVA                                   .clear();
+	    jets_passesPuJetIdLoose                           .clear();
+	    jets_passesPuJetIdMedium                          .clear();
+	    jets_passesPuJetIdTight                           .clear();
             jets_GenJetMatch                                  .clear();
             jets_pfCombinedInclusiveSecondaryVertexV2BJetTags .clear(); 
             jets_pfCombinedMVAV2BJetTags                      .clear(); 
@@ -521,6 +527,9 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "JetInfo.QGL"                                           , &jets_QGL                                          );
             tree_->Branch( "JetInfo.RMS"                                           , &jets_RMS                                          );
             tree_->Branch( "JetInfo.puJetIdMVA"                                    , &jets_puJetIdMVA                                   );
+	    tree_->Branch( "JetInfo.passesPuJetIdLoose"                            , &jets_passesPuJetIdLoose                           );
+	    tree_->Branch( "JetInfo.passesPuJetIdMedium"                           , &jets_passesPuJetIdMedium                          );
+	    tree_->Branch( "JetInfo.passesPuJetIdTight"                            , &jets_passesPuJetIdTight                           );
             tree_->Branch( "JetInfo.GenJetMatch"                                   , &jets_GenJetMatch                                  );
             tree_->Branch( "JetInfo.pfCombinedInclusiveSecondaryVertexV2BJetTags"  , &jets_pfCombinedInclusiveSecondaryVertexV2BJetTags );
             tree_->Branch( "JetInfo.pfCombinedMVAV2BJetTags"                       , &jets_pfCombinedMVAV2BJetTags                      );
