@@ -54,6 +54,26 @@ flashggAnaTreeMakerWithSyst::RegisterTree( TTree* tree )
     dataformat.RegisterTree( tree );
 }
 
+const reco::GenParticle*
+flashggAnaTreeMakerWithSyst::getMother( const reco::GenParticle &part )
+{
+   const reco::GenParticle *mom = &part;
+   
+   while( mom->numberOfMothers() > 0 )
+     {	
+	for( unsigned int j=0;j<mom->numberOfMothers();++j )
+	  {	     
+	     mom = dynamic_cast<const reco::GenParticle*>(mom->mother(j));
+	     if( mom->pdgId() != part.pdgId() )
+	       {		  
+		  return mom;
+	       }	     
+	  }	          
+     }
+   
+   return mom;
+}
+
 void
 flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isDiphoSystTree = false )
 {
@@ -154,6 +174,20 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
                 dataformat.GenParticles_Status .emplace_back( it_gen->status() );
                 dataformat.GenParticles_nMo    .emplace_back( it_gen->numberOfMothers() );
                 dataformat.GenParticles_nDa    .emplace_back( it_gen->numberOfDaughters() );
+	       
+	        dataformat.GenParticles_isHardProcess                              .emplace_back( it_gen->isHardProcess() );
+	        dataformat.GenParticles_fromHardProcessFinalState                  .emplace_back( it_gen->fromHardProcessFinalState() );
+	        dataformat.GenParticles_isPromptFinalState                         .emplace_back( it_gen->isPromptFinalState() );
+	        dataformat.GenParticles_isDirectPromptTauDecayProductFinalState    .emplace_back( it_gen->isDirectPromptTauDecayProductFinalState() );
+	       
+	        const reco::GenParticle* mom = getMother(*it_gen);
+	       
+	        dataformat.GenParticles_MomPdgID    .emplace_back( mom->pdgId() );
+	        dataformat.GenParticles_MomStatus   .emplace_back( mom->status() );
+	        dataformat.GenParticles_MomPt       .emplace_back( mom->pt() );
+	        dataformat.GenParticles_MomEta      .emplace_back( mom->eta() );
+	        dataformat.GenParticles_MomPhi      .emplace_back( mom->phi() );
+	        dataformat.GenParticles_MomMass     .emplace_back( mom->mass() );
 
                 NGenParticles++;
             }

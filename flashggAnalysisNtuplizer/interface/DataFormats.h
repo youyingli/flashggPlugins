@@ -195,6 +195,18 @@ class flashggAnalysisTreeFormatStd
         std::vector<int>   GenParticles_nMo   ; 
         std::vector<int>   GenParticles_nDa   ; 
 
+        std::vector<bool>  GenParticles_isHardProcess;
+        std::vector<bool>  GenParticles_fromHardProcessFinalState;
+        std::vector<bool>  GenParticles_isPromptFinalState;
+        std::vector<bool>  GenParticles_isDirectPromptTauDecayProductFinalState;
+   
+        std::vector<int>   GenParticles_MomPdgID;
+        std::vector<int>   GenParticles_MomStatus;
+        std::vector<float> GenParticles_MomPt;
+        std::vector<float> GenParticles_MomEta;
+        std::vector<float> GenParticles_MomPhi;
+        std::vector<float> GenParticles_MomMass;
+   
         int HTXSstage0cat ;
         int HTXSstage1cat ;
         int HTXSnjets     ;
@@ -390,6 +402,18 @@ class flashggAnalysisTreeFormatStd
             GenParticles_nMo    .clear(); 
             GenParticles_nDa    .clear(); 
 
+            GenParticles_isHardProcess                             .clear();
+            GenParticles_fromHardProcessFinalState                 .clear();
+            GenParticles_isPromptFinalState                        .clear();
+            GenParticles_isDirectPromptTauDecayProductFinalState   .clear();
+   
+            GenParticles_MomPdgID                                  .clear();
+            GenParticles_MomStatus                                 .clear();
+            GenParticles_MomPt                                     .clear();
+            GenParticles_MomEta                                    .clear();
+            GenParticles_MomPhi                                    .clear();
+            GenParticles_MomMass                                   .clear();
+	   
             HTXSstage0cat = -999; 
             HTXSstage1cat = -999; 
             HTXSnjets     = -999; 
@@ -587,7 +611,19 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "GenPartInfo.Status" , &GenParticles_Status );
             tree_->Branch( "GenPartInfo.nMo"    , &GenParticles_nMo    );
             tree_->Branch( "GenPartInfo.nDa"    , &GenParticles_nDa    );
-
+	   
+	    tree_->Branch( "GenPartInfo.isHardProcess"                              , &GenParticles_isHardProcess    );
+	    tree_->Branch( "GenPartInfo.fromHardProcessFinalState"                  , &GenParticles_fromHardProcessFinalState    );
+	    tree_->Branch( "GenPartInfo.isPromptFinalState"                         , &GenParticles_isPromptFinalState    );
+	    tree_->Branch( "GenPartInfo.isDirectPromptTauDecayProductFinalState"    , &GenParticles_isDirectPromptTauDecayProductFinalState    );
+	   
+	    tree_->Branch( "GenPartInfo.MomPdgID"        , &GenParticles_MomPdgID    );
+	    tree_->Branch( "GenPartInfo.MomStatus"       , &GenParticles_MomStatus   );
+	    tree_->Branch( "GenPartInfo.MomPt"           , &GenParticles_MomPt       );
+	    tree_->Branch( "GenPartInfo.MomEta"          , &GenParticles_MomEta      );
+	    tree_->Branch( "GenPartInfo.MomPhi"          , &GenParticles_MomPhi      );
+	    tree_->Branch( "GenPartInfo.MomMass"         , &GenParticles_MomMass     );
+	   
             tree_->Branch( "HTXSstage0cat"   , &HTXSstage0cat  , "HTXSstage0cat/I" );
             tree_->Branch( "HTXSstage1cat"   , &HTXSstage1cat  , "HTXSstage1cat/I" );
             tree_->Branch( "HTXSnjets"       , &HTXSnjets      , "HTXSnjets/I"     );
