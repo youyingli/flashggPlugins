@@ -54,6 +54,26 @@ flashggAnaTreeMakerWithSyst::RegisterTree( TTree* tree )
     dataformat.RegisterTree( tree );
 }
 
+const reco::GenParticle*
+flashggAnaTreeMakerWithSyst::getMother( const reco::GenParticle &part )
+{
+   const reco::GenParticle *mom = &part;
+   
+   while( mom->numberOfMothers() > 0 )
+     {	
+	for( unsigned int j=0;j<mom->numberOfMothers();++j )
+	  {	     
+	     mom = dynamic_cast<const reco::GenParticle*>(mom->mother(j));
+	     if( mom->pdgId() != part.pdgId() )
+	       {		  
+		  return mom;
+	       }	     
+	  }	          
+     }
+   
+   return mom;
+}
+
 void
 flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::EventSetup &iSetup, bool isDiphoSystTree = false )
 {
@@ -154,6 +174,20 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
                 dataformat.GenParticles_Status .emplace_back( it_gen->status() );
                 dataformat.GenParticles_nMo    .emplace_back( it_gen->numberOfMothers() );
                 dataformat.GenParticles_nDa    .emplace_back( it_gen->numberOfDaughters() );
+	       
+	        dataformat.GenParticles_isHardProcess                              .emplace_back( it_gen->isHardProcess() );
+	        dataformat.GenParticles_fromHardProcessFinalState                  .emplace_back( it_gen->fromHardProcessFinalState() );
+	        dataformat.GenParticles_isPromptFinalState                         .emplace_back( it_gen->isPromptFinalState() );
+	        dataformat.GenParticles_isDirectPromptTauDecayProductFinalState    .emplace_back( it_gen->isDirectPromptTauDecayProductFinalState() );
+	       
+	        const reco::GenParticle* mom = getMother(*it_gen);
+	       
+	        dataformat.GenParticles_MomPdgID    .emplace_back( mom->pdgId() );
+	        dataformat.GenParticles_MomStatus   .emplace_back( mom->status() );
+	        dataformat.GenParticles_MomPt       .emplace_back( mom->pt() );
+	        dataformat.GenParticles_MomEta      .emplace_back( mom->eta() );
+	        dataformat.GenParticles_MomPhi      .emplace_back( mom->phi() );
+	        dataformat.GenParticles_MomMass     .emplace_back( mom->mass() );
 
                 NGenParticles++;
             }
@@ -192,6 +226,8 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
         dataformat.dipho_leadsieie            = diphoPtr->leadingPhoton()->full5x5_sigmaIetaIeta();
         dataformat.dipho_leadhoe              = diphoPtr->leadingPhoton()->hadronicOverEm();
         dataformat.dipho_leadIDMVA            = diphoPtr->leadingView()->phoIdMvaWrtChosenVtx();
+        dataformat.dipho_leadIsEB             = diphoPtr->leadingPhoton()->isEB();
+        dataformat.dipho_leadIsEE             = diphoPtr->leadingPhoton()->isEE();
         dataformat.dipho_leadhasPixelSeed     = diphoPtr->leadingPhoton()->hasPixelSeed();
         dataformat.dipho_leadGenMatch         = diphoPtr->leadingPhoton()->hasMatchedGenPhoton();
         dataformat.dipho_leadGenMatchType     = diphoPtr->leadingPhoton()->genMatchType();//enum mcMatch_t { kUnkown = 0, kPrompt, kFake  };
@@ -206,6 +242,8 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
         dataformat.dipho_subleadsieie         = diphoPtr->subLeadingPhoton()->full5x5_sigmaIetaIeta();
         dataformat.dipho_subleadhoe           = diphoPtr->subLeadingPhoton()->hadronicOverEm();
         dataformat.dipho_subleadIDMVA         = diphoPtr->subLeadingView()->phoIdMvaWrtChosenVtx();
+        dataformat.dipho_subleadIsEB          = diphoPtr->subLeadingPhoton()->isEB();
+        dataformat.dipho_subleadIsEE          = diphoPtr->subLeadingPhoton()->isEE();
         dataformat.dipho_subleadhasPixelSeed  = diphoPtr->subLeadingPhoton()->hasPixelSeed();
         dataformat.dipho_subleadGenMatch      = diphoPtr->subLeadingPhoton()->hasMatchedGenPhoton();
         dataformat.dipho_subleadGenMatchType  = diphoPtr->subLeadingPhoton()->genMatchType();
@@ -355,7 +393,13 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_PtRaw                         .emplace_back( it_jet->correctedJet( "Uncorrected" ).pt() );
             dataformat.jets_QGL                           .emplace_back( it_jet->QGL() );
             dataformat.jets_RMS                           .emplace_back( it_jet->rms() );
-            dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
+	    dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
+	    if (diphotonPtrs.size() > 0) 
+	      {		
+		 dataformat.jets_passesPuJetIdLoose       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kLoose ) );
+		 dataformat.jets_passesPuJetIdMedium      .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kMedium ) );
+		 dataformat.jets_passesPuJetIdTight       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kTight ) );
+	      }	   
             dataformat.jets_GenJetMatch                   .emplace_back( it_jet->hasGenMatch() );
             dataformat.jets_pfCombinedInclusiveSecondaryVertexV2BJetTags        
                                                           .emplace_back( it_jet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ) );
@@ -365,6 +409,13 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_pfDeepCSVJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepCSVJetTags:probc" ) );
             dataformat.jets_pfDeepCSVJetTags_probudsg     .emplace_back( it_jet->bDiscriminator( "pfDeepCSVJetTags:probudsg" ) );
 
+            dataformat.jets_pfDeepFlavourJetTags_probb        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probb" ) );
+	    dataformat.jets_pfDeepFlavourJetTags_probbb       .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probbb" ) );
+	    dataformat.jets_pfDeepFlavourJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probc" ) );
+	    dataformat.jets_pfDeepFlavourJetTags_probuds      .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probuds" ) );
+ 	    dataformat.jets_pfDeepFlavourJetTags_probg        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probg" ) );
+	    dataformat.jets_pfDeepFlavourJetTags_problepb     .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:problepb" ) );
+	   
             auto jer = flashggAnalysisNtuplizer::JERUncertainty( *it_jet, *rho, iSetup );
             dataformat.jets_JECScale                      .emplace_back( it_jet->pt() / it_jet->correctedJet( "Uncorrected" ).pt() );
             dataformat.jets_JERScale                      .emplace_back( std::get<0>(jer) );

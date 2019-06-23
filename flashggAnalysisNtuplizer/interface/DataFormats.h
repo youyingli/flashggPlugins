@@ -36,6 +36,8 @@ class flashggAnalysisTreeFormatStd
         float dipho_leadsieie            ; 
         float dipho_leadhoe              ; 
         float dipho_leadIDMVA            ;
+        bool  dipho_leadIsEB             ;
+        bool  dipho_leadIsEE             ;
         bool  dipho_leadhasPixelSeed     ;
         bool  dipho_leadGenMatch         ;
         int   dipho_leadGenMatchType     ;
@@ -49,7 +51,9 @@ class flashggAnalysisTreeFormatStd
         float dipho_subleadR9            ; 
         float dipho_subleadsieie         ; 
         float dipho_subleadhoe           ; 
-        float dipho_subleadIDMVA         ; 
+        float dipho_subleadIDMVA         ;
+        bool  dipho_subleadIsEB          ;
+        bool  dipho_subleadIsEE          ;
         bool  dipho_subleadhasPixelSeed  ;
         bool  dipho_subleadGenMatch      ;
         int   dipho_subleadGenMatchType  ;
@@ -130,6 +134,9 @@ class flashggAnalysisTreeFormatStd
         std::vector<float> jets_QGL                                           ;
         std::vector<float> jets_RMS                                           ;
         std::vector<float> jets_puJetIdMVA                                    ;
+        std::vector<bool>  jets_passesPuJetIdLoose                            ;
+        std::vector<bool>  jets_passesPuJetIdMedium                           ;
+        std::vector<bool>  jets_passesPuJetIdTight                            ;
         std::vector<bool>  jets_GenJetMatch                                   ;
         std::vector<float> jets_pfCombinedInclusiveSecondaryVertexV2BJetTags  ; 
         std::vector<float> jets_pfCombinedMVAV2BJetTags                       ; 
@@ -137,6 +144,12 @@ class flashggAnalysisTreeFormatStd
         std::vector<float> jets_pfDeepCSVJetTags_probbb                       ; 
         std::vector<float> jets_pfDeepCSVJetTags_probc                        ; 
         std::vector<float> jets_pfDeepCSVJetTags_probudsg                     ;
+        std::vector<float> jets_pfDeepFlavourJetTags_probb                    ;
+        std::vector<float> jets_pfDeepFlavourJetTags_probbb                   ;
+        std::vector<float> jets_pfDeepFlavourJetTags_probc                    ;
+        std::vector<float> jets_pfDeepFlavourJetTags_probuds                  ;
+        std::vector<float> jets_pfDeepFlavourJetTags_probg                    ;
+        std::vector<float> jets_pfDeepFlavourJetTags_problepb                 ;
         std::vector<float> jets_JECScale                                      ;
         std::vector<float> jets_JERScale                                      ;
         std::vector<float> jets_JECUnc                                        ;
@@ -182,6 +195,18 @@ class flashggAnalysisTreeFormatStd
         std::vector<int>   GenParticles_nMo   ; 
         std::vector<int>   GenParticles_nDa   ; 
 
+        std::vector<bool>  GenParticles_isHardProcess;
+        std::vector<bool>  GenParticles_fromHardProcessFinalState;
+        std::vector<bool>  GenParticles_isPromptFinalState;
+        std::vector<bool>  GenParticles_isDirectPromptTauDecayProductFinalState;
+   
+        std::vector<int>   GenParticles_MomPdgID;
+        std::vector<int>   GenParticles_MomStatus;
+        std::vector<float> GenParticles_MomPt;
+        std::vector<float> GenParticles_MomEta;
+        std::vector<float> GenParticles_MomPhi;
+        std::vector<float> GenParticles_MomMass;
+   
         int HTXSstage0cat ;
         int HTXSstage1cat ;
         int HTXSnjets     ;
@@ -218,6 +243,8 @@ class flashggAnalysisTreeFormatStd
             dipho_leadsieie                = -999.; 
             dipho_leadhoe                  = -999.; 
             dipho_leadIDMVA                = -999.;
+	    dipho_leadIsEB                 = false;
+	    dipho_leadIsEE                 = false;
             dipho_leadhasPixelSeed         = false;
             dipho_leadGenMatch             = false; 
             dipho_leadGenMatchType         = -999; 
@@ -231,7 +258,9 @@ class flashggAnalysisTreeFormatStd
             dipho_subleadR9                = -999.; 
             dipho_subleadsieie             = -999.; 
             dipho_subleadhoe               = -999.; 
-            dipho_subleadIDMVA             = -999.; 
+            dipho_subleadIDMVA             = -999.;
+	    dipho_subleadIsEB              = false;
+	    dipho_subleadIsEE              = false;
             dipho_subleadhasPixelSeed      = false;
             dipho_subleadGenMatch          = false; 
             dipho_subleadGenMatchType      = -999;
@@ -311,7 +340,10 @@ class flashggAnalysisTreeFormatStd
             jets_PtRaw                                        .clear(); 
             jets_QGL                                          .clear(); 
             jets_RMS                                          .clear(); 
-            jets_puJetIdMVA                                   .clear(); 
+            jets_puJetIdMVA                                   .clear();
+	    jets_passesPuJetIdLoose                           .clear();
+	    jets_passesPuJetIdMedium                          .clear();
+	    jets_passesPuJetIdTight                           .clear();
             jets_GenJetMatch                                  .clear();
             jets_pfCombinedInclusiveSecondaryVertexV2BJetTags .clear(); 
             jets_pfCombinedMVAV2BJetTags                      .clear(); 
@@ -319,6 +351,12 @@ class flashggAnalysisTreeFormatStd
             jets_pfDeepCSVJetTags_probbb                      .clear(); 
             jets_pfDeepCSVJetTags_probc                       .clear(); 
             jets_pfDeepCSVJetTags_probudsg                    .clear();
+ 	    jets_pfDeepFlavourJetTags_probb                   .clear();
+	    jets_pfDeepFlavourJetTags_probbb                  .clear();
+	    jets_pfDeepFlavourJetTags_probc                   .clear();
+	    jets_pfDeepFlavourJetTags_probuds                 .clear();
+	    jets_pfDeepFlavourJetTags_probg                   .clear();
+ 	    jets_pfDeepFlavourJetTags_problepb                .clear();
             jets_JECScale                                     .clear(); 
             jets_JERScale                                     .clear(); 
             jets_JECUnc                                       .clear(); 
@@ -364,6 +402,18 @@ class flashggAnalysisTreeFormatStd
             GenParticles_nMo    .clear(); 
             GenParticles_nDa    .clear(); 
 
+            GenParticles_isHardProcess                             .clear();
+            GenParticles_fromHardProcessFinalState                 .clear();
+            GenParticles_isPromptFinalState                        .clear();
+            GenParticles_isDirectPromptTauDecayProductFinalState   .clear();
+   
+            GenParticles_MomPdgID                                  .clear();
+            GenParticles_MomStatus                                 .clear();
+            GenParticles_MomPt                                     .clear();
+            GenParticles_MomEta                                    .clear();
+            GenParticles_MomPhi                                    .clear();
+            GenParticles_MomMass                                   .clear();
+	   
             HTXSstage0cat = -999; 
             HTXSstage1cat = -999; 
             HTXSnjets     = -999; 
@@ -403,6 +453,8 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "DiPhoInfo.leadsieie"               , &dipho_leadsieie              , "DiPhoInfo.leadsieie/F"            );
             tree_->Branch( "DiPhoInfo.leadhoe"                 , &dipho_leadhoe                , "DiPhoInfo.leadhoe/F"              );
             tree_->Branch( "DiPhoInfo.leadIDMVA"               , &dipho_leadIDMVA              , "DiPhoInfo.leadIDMVA/F"            );
+	    tree_->Branch( "DiPhoInfo.leadIsEB"                , &dipho_leadIsEB               , "DiPhoInfo.leadIsEB/O"             );
+	    tree_->Branch( "DiPhoInfo.leadIsEE"                , &dipho_leadIsEE               , "DiPhoInfo.leadIsEE/O"             );
             tree_->Branch( "DiPhoInfo.leadhasPixelSeed"        , &dipho_leadhasPixelSeed       , "DiPhoInfo.leadhasPixelSeed/O"     );
             tree_->Branch( "DiPhoInfo.leadGenMatch"            , &dipho_leadGenMatch           , "DiPhoInfo.leadGenMatch/O"         );
             tree_->Branch( "DiPhoInfo.leadGenMatchType"        , &dipho_leadGenMatchType       , "DiPhoInfo.leadGenMatchType/I"     );
@@ -417,6 +469,8 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "DiPhoInfo.subleadsieie"            , &dipho_subleadsieie           , "DiPhoInfo.subleadsieie/F"         );
             tree_->Branch( "DiPhoInfo.subleadhoe"              , &dipho_subleadhoe             , "DiPhoInfo.subleadhoe/F"           );
             tree_->Branch( "DiPhoInfo.subleadIDMVA"            , &dipho_subleadIDMVA           , "DiPhoInfo.subleadIDMVA/F"         );
+	    tree_->Branch( "DiPhoInfo.subleadIsEB"             , &dipho_subleadIsEB            , "DiPhoInfo.subleadIsEB/O"          );
+	    tree_->Branch( "DiPhoInfo.subleadIsEE"             , &dipho_subleadIsEE            , "DiPhoInfo.subleadIsEE/O"          );
             tree_->Branch( "DiPhoInfo.subleadhasPixelSeed"     , &dipho_subleadhasPixelSeed    , "DiPhoInfo.subleadhasPixelSeed/O"  );
             tree_->Branch( "DiPhoInfo.subleadGenMatch"         , &dipho_subleadGenMatch        , "DiPhoInfo.subleadGenMatch/O"      );
             tree_->Branch( "DiPhoInfo.subleadGenMatchType"     , &dipho_subleadGenMatchType    , "DiPhoInfo.subleadGenMatchType/I"  );
@@ -497,6 +551,9 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "JetInfo.QGL"                                           , &jets_QGL                                          );
             tree_->Branch( "JetInfo.RMS"                                           , &jets_RMS                                          );
             tree_->Branch( "JetInfo.puJetIdMVA"                                    , &jets_puJetIdMVA                                   );
+	    tree_->Branch( "JetInfo.passesPuJetIdLoose"                            , &jets_passesPuJetIdLoose                           );
+	    tree_->Branch( "JetInfo.passesPuJetIdMedium"                           , &jets_passesPuJetIdMedium                          );
+	    tree_->Branch( "JetInfo.passesPuJetIdTight"                            , &jets_passesPuJetIdTight                           );
             tree_->Branch( "JetInfo.GenJetMatch"                                   , &jets_GenJetMatch                                  );
             tree_->Branch( "JetInfo.pfCombinedInclusiveSecondaryVertexV2BJetTags"  , &jets_pfCombinedInclusiveSecondaryVertexV2BJetTags );
             tree_->Branch( "JetInfo.pfCombinedMVAV2BJetTags"                       , &jets_pfCombinedMVAV2BJetTags                      );
@@ -504,6 +561,12 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probbb"                       , &jets_pfDeepCSVJetTags_probbb                      );
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probc"                        , &jets_pfDeepCSVJetTags_probc                       );
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probudsg"                     , &jets_pfDeepCSVJetTags_probudsg                    );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_probb"                    , &jets_pfDeepFlavourJetTags_probb                   );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_probbb"                   , &jets_pfDeepFlavourJetTags_probbb                  );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_probc"                    , &jets_pfDeepFlavourJetTags_probc                   );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_probuds"                  , &jets_pfDeepFlavourJetTags_probuds                 );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_probg"                    , &jets_pfDeepFlavourJetTags_probg                   );
+	    tree_->Branch( "JetInfo.pfDeepFlavourJetTags_problepb"                 , &jets_pfDeepFlavourJetTags_problepb                );
             tree_->Branch( "JetInfo.JECScale"                                      , &jets_JECScale                                     );
             tree_->Branch( "JetInfo.JERScale"                                      , &jets_JERScale                                     );
             tree_->Branch( "JetInfo.JECUnc"                                        , &jets_JECUnc                                       );
@@ -548,7 +611,19 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "GenPartInfo.Status" , &GenParticles_Status );
             tree_->Branch( "GenPartInfo.nMo"    , &GenParticles_nMo    );
             tree_->Branch( "GenPartInfo.nDa"    , &GenParticles_nDa    );
-
+	   
+	    tree_->Branch( "GenPartInfo.isHardProcess"                              , &GenParticles_isHardProcess    );
+	    tree_->Branch( "GenPartInfo.fromHardProcessFinalState"                  , &GenParticles_fromHardProcessFinalState    );
+	    tree_->Branch( "GenPartInfo.isPromptFinalState"                         , &GenParticles_isPromptFinalState    );
+	    tree_->Branch( "GenPartInfo.isDirectPromptTauDecayProductFinalState"    , &GenParticles_isDirectPromptTauDecayProductFinalState    );
+	   
+	    tree_->Branch( "GenPartInfo.MomPdgID"        , &GenParticles_MomPdgID    );
+	    tree_->Branch( "GenPartInfo.MomStatus"       , &GenParticles_MomStatus   );
+	    tree_->Branch( "GenPartInfo.MomPt"           , &GenParticles_MomPt       );
+	    tree_->Branch( "GenPartInfo.MomEta"          , &GenParticles_MomEta      );
+	    tree_->Branch( "GenPartInfo.MomPhi"          , &GenParticles_MomPhi      );
+	    tree_->Branch( "GenPartInfo.MomMass"         , &GenParticles_MomMass     );
+	   
             tree_->Branch( "HTXSstage0cat"   , &HTXSstage0cat  , "HTXSstage0cat/I" );
             tree_->Branch( "HTXSstage1cat"   , &HTXSstage1cat  , "HTXSstage1cat/I" );
             tree_->Branch( "HTXSnjets"       , &HTXSnjets      , "HTXSnjets/I"     );
