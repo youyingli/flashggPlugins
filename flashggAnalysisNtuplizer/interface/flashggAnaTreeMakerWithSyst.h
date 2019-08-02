@@ -29,6 +29,7 @@ class flashggAnaTreeMakerWithSyst
         ~flashggAnaTreeMakerWithSyst();
         void Analyze( const edm::Event &, const edm::EventSetup &, bool );
         void RegisterTree( TTree* );
+        const reco::GenParticle* getMother( const reco::GenParticle &part );
     
     private:
     
