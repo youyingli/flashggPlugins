@@ -31,13 +31,19 @@ class flashggAnaTreeMerge : public edm::EDAnalyzer
         virtual void analyze( const edm::Event &, const edm::EventSetup & ) override;
         virtual void endJob() override;
     
-    
+        //Global tree
+        globalTreeFormat globaltreeformat;
+        edm::EDGetTokenT<GenEventInfoProduct> genEventInfoToken_;
+        edm::Handle<GenEventInfoProduct>     genEventInfo;
+
+        //Standard tree
         std::vector<std::string> DiphoSystNames_; 
         std::vector<flashggAnaTreeMakerWithSyst*> TreeMakeList_;
 
 };
 
 flashggAnaTreeMerge::flashggAnaTreeMerge( const edm::ParameterSet &iConfig ):
+    genEventInfoToken_(consumes<GenEventInfoProduct>( edm::InputTag("generator", "") )),
     DiphoSystNames_(iConfig.getParameter<vector<string>>( "diphosystnames" ))
 {
     std::vector<edm::InputTag> diphotons        = iConfig.getParameter<std::vector<edm::InputTag>>( "diphotons" );
@@ -59,6 +65,9 @@ flashggAnaTreeMerge::~flashggAnaTreeMerge()
 void
 flashggAnaTreeMerge::beginJob()
 {
+    TTree* globaltree = fs_->make<TTree>( "global", "" );
+    globaltreeformat.RegisterTree( globaltree );
+
     int i_syst = 0;
     for ( auto& TreeMake : TreeMakeList_ ) {
         TTree* tree = fs_->make<TTree>( Form("flashggStdTree%s",DiphoSystNames_[i_syst].c_str()), "" );
@@ -75,6 +84,13 @@ flashggAnaTreeMerge::endJob()
 void
 flashggAnaTreeMerge::analyze( const edm::Event &iEvent, const edm::EventSetup &iSetup )
 {
+    //Global
+    globaltreeformat.Initialzation();
+    iEvent.getByToken( genEventInfoToken_ , genEventInfo );
+    if(!iEvent.isRealData()) globaltreeformat.weight = genEventInfo->weight();
+    globaltreeformat.TreeFill();
+
+
     int itree = 0;
     for ( const auto& TreeMake : TreeMakeList_ ) {
         if (itree == 0) TreeMake->Analyze(iEvent, iSetup, false);

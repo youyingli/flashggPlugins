@@ -57,21 +57,16 @@ flashggAnaTreeMakerWithSyst::RegisterTree( TTree* tree )
 const reco::GenParticle*
 flashggAnaTreeMakerWithSyst::getMother( const reco::GenParticle &part )
 {
-   const reco::GenParticle *mom = &part;
-   
-   while( mom->numberOfMothers() > 0 )
-     {	
-	for( unsigned int j=0;j<mom->numberOfMothers();++j )
-	  {	     
-	     mom = dynamic_cast<const reco::GenParticle*>(mom->mother(j));
-	     if( mom->pdgId() != part.pdgId() )
-	       {		  
-		  return mom;
-	       }	     
-	  }	          
-     }
-   
-   return mom;
+    const reco::GenParticle *mom = &part;
+
+    while( mom->numberOfMothers() > 0 ) {
+        for( unsigned int j=0;j<mom->numberOfMothers();++j ) {
+            mom = dynamic_cast<const reco::GenParticle*>(mom->mother(j));
+            if( mom->pdgId() != part.pdgId() ) return mom;
+        }
+    }
+
+    return mom;
 }
 
 void
@@ -161,10 +156,8 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             int NGenParticles = 0;
             const std::vector<edm::Ptr<reco::GenParticle> > genParticlesPtrs = genParticles->ptrs();
             for (const auto& it_gen : genParticles->ptrs()) {
-                if ( abs(it_gen->pdgId()) > 25) continue;
+                if ( abs(it_gen->pdgId()) > 25 ) continue;
                 if ( it_gen->status() > 30 ) continue;
-                //if ( it_gen->pdgId() == 22      && it_gen->status() == 1 && !(it_gen->pt() > 10 || it_gen->isPromptFinalState())) continue;
-                //if ( abs(it_gen->pdgId()) == 11 && it_gen->status() == 1 && !(it_gen->pt() > 3  || it_gen->isPromptFinalState())) continue;
 
                 dataformat.GenParticles_Pt     .emplace_back( it_gen->pt() );
                 dataformat.GenParticles_Eta    .emplace_back( it_gen->eta() );
@@ -175,19 +168,19 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
                 dataformat.GenParticles_nMo    .emplace_back( it_gen->numberOfMothers() );
                 dataformat.GenParticles_nDa    .emplace_back( it_gen->numberOfDaughters() );
 	       
-	        dataformat.GenParticles_isHardProcess                              .emplace_back( it_gen->isHardProcess() );
-	        dataformat.GenParticles_fromHardProcessFinalState                  .emplace_back( it_gen->fromHardProcessFinalState() );
-	        dataformat.GenParticles_isPromptFinalState                         .emplace_back( it_gen->isPromptFinalState() );
-	        dataformat.GenParticles_isDirectPromptTauDecayProductFinalState    .emplace_back( it_gen->isDirectPromptTauDecayProductFinalState() );
-	       
-	        const reco::GenParticle* mom = getMother(*it_gen);
-	       
-	        dataformat.GenParticles_MomPdgID    .emplace_back( mom->pdgId() );
-	        dataformat.GenParticles_MomStatus   .emplace_back( mom->status() );
-	        dataformat.GenParticles_MomPt       .emplace_back( mom->pt() );
-	        dataformat.GenParticles_MomEta      .emplace_back( mom->eta() );
-	        dataformat.GenParticles_MomPhi      .emplace_back( mom->phi() );
-	        dataformat.GenParticles_MomMass     .emplace_back( mom->mass() );
+                dataformat.GenParticles_isHardProcess                              .emplace_back( it_gen->isHardProcess() );
+                dataformat.GenParticles_fromHardProcessFinalState                  .emplace_back( it_gen->fromHardProcessFinalState() );
+                dataformat.GenParticles_isPromptFinalState                         .emplace_back( it_gen->isPromptFinalState() );
+                dataformat.GenParticles_isDirectPromptTauDecayProductFinalState    .emplace_back( it_gen->isDirectPromptTauDecayProductFinalState() );
+
+                const reco::GenParticle* mom = getMother(*it_gen);
+
+                dataformat.GenParticles_MomPdgID    .emplace_back( mom->pdgId() );
+                dataformat.GenParticles_MomStatus   .emplace_back( mom->status() );
+                dataformat.GenParticles_MomPt       .emplace_back( mom->pt() );
+                dataformat.GenParticles_MomEta      .emplace_back( mom->eta() );
+                dataformat.GenParticles_MomPhi      .emplace_back( mom->phi() );
+                dataformat.GenParticles_MomMass     .emplace_back( mom->mass() );
 
                 NGenParticles++;
             }
@@ -393,13 +386,10 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_PtRaw                         .emplace_back( it_jet->correctedJet( "Uncorrected" ).pt() );
             dataformat.jets_QGL                           .emplace_back( it_jet->QGL() );
             dataformat.jets_RMS                           .emplace_back( it_jet->rms() );
-	    dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
-	    if (diphotonPtrs.size() > 0) 
-	      {		
-		 dataformat.jets_passesPuJetIdLoose       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kLoose ) );
-		 dataformat.jets_passesPuJetIdMedium      .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kMedium ) );
-		 dataformat.jets_passesPuJetIdTight       .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kTight ) );
-	      }	   
+            dataformat.jets_puJetIdMVA                    .emplace_back( it_jet->puJetIdMVA() );
+            dataformat.jets_passesPuJetIdLoose            .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kLoose ) );
+            dataformat.jets_passesPuJetIdMedium           .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kMedium ) );
+            dataformat.jets_passesPuJetIdTight            .emplace_back( it_jet->passesPuJetId( diphotonPtrs[0], PileupJetIdentifier::kTight ) );
             dataformat.jets_GenJetMatch                   .emplace_back( it_jet->hasGenMatch() );
             dataformat.jets_pfCombinedInclusiveSecondaryVertexV2BJetTags        
                                                           .emplace_back( it_jet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ) );
@@ -410,11 +400,11 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_pfDeepCSVJetTags_probudsg     .emplace_back( it_jet->bDiscriminator( "pfDeepCSVJetTags:probudsg" ) );
 
             dataformat.jets_pfDeepFlavourJetTags_probb        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probb" ) );
-	    dataformat.jets_pfDeepFlavourJetTags_probbb       .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probbb" ) );
-	    dataformat.jets_pfDeepFlavourJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probc" ) );
-	    dataformat.jets_pfDeepFlavourJetTags_probuds      .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probuds" ) );
- 	    dataformat.jets_pfDeepFlavourJetTags_probg        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probg" ) );
-	    dataformat.jets_pfDeepFlavourJetTags_problepb     .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:problepb" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probbb       .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probbb" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probc" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probuds      .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probuds" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probg        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probg" ) );
+            dataformat.jets_pfDeepFlavourJetTags_problepb     .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:problepb" ) );
 	   
             auto jer = flashggAnalysisNtuplizer::JERUncertainty( *it_jet, *rho, iSetup );
             dataformat.jets_JECScale                      .emplace_back( it_jet->pt() / it_jet->correctedJet( "Uncorrected" ).pt() );
@@ -478,11 +468,11 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.met_CorrPhiShiftPhoEnUp          = theMet->shiftedPhi ( pat::MET::PhotonEnUp        );
             dataformat.met_CorrPhiShiftPhoEnDown        = theMet->shiftedPhi ( pat::MET::PhotonEnDown      );
         }
-    }
-    //Only store the first diphoton candidate which passes diphoton preselection
-    //If events with on diphoton candidate passing the diphoton preselection, the mass will be set -999.
-    dataformat.TreeFill();
+    
+        //Only store the first diphoton candidate which passes diphoton preselection with mass > 100 GeV
+        if(diphoPtr->mass() > 100.) dataformat.TreeFill();
 
+    }//diphoton candidate > 0
 }
 
 // Local Variables:
