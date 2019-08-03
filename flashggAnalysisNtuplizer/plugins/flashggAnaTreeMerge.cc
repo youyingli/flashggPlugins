@@ -65,9 +65,11 @@ flashggAnaTreeMerge::~flashggAnaTreeMerge()
 void
 flashggAnaTreeMerge::beginJob()
 {
+    //Global tree
     TTree* globaltree = fs_->make<TTree>( "global", "" );
     globaltreeformat.RegisterTree( globaltree );
 
+    //Standard tree
     int i_syst = 0;
     for ( auto& TreeMake : TreeMakeList_ ) {
         TTree* tree = fs_->make<TTree>( Form("flashggStdTree%s",DiphoSystNames_[i_syst].c_str()), "" );
@@ -84,13 +86,13 @@ flashggAnaTreeMerge::endJob()
 void
 flashggAnaTreeMerge::analyze( const edm::Event &iEvent, const edm::EventSetup &iSetup )
 {
-    //Global
+    //Global tree
     globaltreeformat.Initialzation();
     iEvent.getByToken( genEventInfoToken_ , genEventInfo );
     if(!iEvent.isRealData()) globaltreeformat.weight = genEventInfo->weight();
     globaltreeformat.TreeFill();
 
-
+    //Standard tree
     int itree = 0;
     for ( const auto& TreeMake : TreeMakeList_ ) {
         if (itree == 0) TreeMake->Analyze(iEvent, iSetup, false);
