@@ -8,6 +8,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "flashgg/DataFormats/interface/Jet.h"
 #include "TTree.h"
+#include "TH1D.h"
 
 #include "flashggPlugins/flashggAnalysisNtuplizer/interface/flashggAnaTreeMakerWithSyst.h"
 
@@ -32,9 +33,10 @@ class flashggAnaTreeMerge : public edm::EDAnalyzer
         virtual void endJob() override;
     
         //Global tree
-        globalTreeFormat globaltreeformat;
         edm::EDGetTokenT<GenEventInfoProduct> genEventInfoToken_;
         edm::Handle<GenEventInfoProduct>     genEventInfo;
+        TH1D* h1_weight;
+        double weight;
 
         //Standard tree
         std::vector<std::string> DiphoSystNames_; 
@@ -53,6 +55,7 @@ flashggAnaTreeMerge::flashggAnaTreeMerge( const edm::ParameterSet &iConfig ):
     for ( unsigned int i_diphoton = 0; i_diphoton < diphotons.size(); i_diphoton++ )
         TreeMakeList_.emplace_back( new flashggAnaTreeMakerWithSyst( diphotons[i_diphoton], diphotonMVAs[i_diphoton], 
                                                                      NonDiphoSetting, consumesCollector() ) );
+    weight = 0.;
 }
 
 flashggAnaTreeMerge::~flashggAnaTreeMerge()
@@ -65,9 +68,8 @@ flashggAnaTreeMerge::~flashggAnaTreeMerge()
 void
 flashggAnaTreeMerge::beginJob()
 {
-    //Global tree
-    TTree* globaltree = fs_->make<TTree>( "global", "" );
-    globaltreeformat.RegisterTree( globaltree );
+    //Global weight
+    h1_weight = fs_->make<TH1D>( "h1_weight", "", 1, 0., 1. );
 
     //Standard tree
     int i_syst = 0;
@@ -81,16 +83,15 @@ flashggAnaTreeMerge::beginJob()
 void
 flashggAnaTreeMerge::endJob()
 {
+    h1_weight->SetBinContent(1, weight);
 }
 
 void
 flashggAnaTreeMerge::analyze( const edm::Event &iEvent, const edm::EventSetup &iSetup )
 {
-    //Global tree
-    globaltreeformat.Initialzation();
+    //Global weight 
     iEvent.getByToken( genEventInfoToken_ , genEventInfo );
-    if(!iEvent.isRealData()) globaltreeformat.weight = genEventInfo->weight();
-    globaltreeformat.TreeFill();
+    if(!iEvent.isRealData()) weight += genEventInfo->weight();
 
     //Standard tree
     int itree = 0;

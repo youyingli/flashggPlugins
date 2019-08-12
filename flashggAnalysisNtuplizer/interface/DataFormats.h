@@ -4,29 +4,6 @@
 #include <TTree.h>
 #include <vector>
 
-
-class globalTreeFormat
-{
-    public:
-
-        float weight;
-
-        void Initialzation() {
-            weight = 1.;
-        }
-
-        void RegisterTree(TTree* tree) {
-            tree_ = tree;
-            tree_->Branch( "weight" , &weight , "weight/F" );
-        }
-
-        void TreeFill() { tree_->Fill(); }
-
-    private:
-        TTree* tree_;
-
-};
-
 class flashggAnalysisTreeFormatStd
 {
     public:
@@ -45,7 +22,7 @@ class flashggAnalysisTreeFormatStd
         bool Flag_globalSuperTightHalo2016Filter     ;
         bool Flag_BadPFMuonFilter                    ;
         bool Flag_eeBadScFilter                      ;
-                                            
+
         float dipho_mass                 ;
         float dipho_pt                   ;
         float dipho_leadPt               ; 

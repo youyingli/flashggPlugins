@@ -63,9 +63,16 @@ if options.year == '2016':
         process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mcRun2_asymptotic_v3')
 elif options.year == '2017':
     if options.processType == 'data':
-        process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_ReReco_EOY17_v6')
+        process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v11')
     else:
-        process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v14')
+        process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v17')
+elif options.year == '2018':
+    if options.processType == 'data':
+        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v11')
+    elif options.processType == 'dataD':
+        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v14')
+    else:
+        process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v19')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
 
