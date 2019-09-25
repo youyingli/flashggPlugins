@@ -22,6 +22,7 @@ class flashggAnalysisTreeFormatStd
         bool Flag_globalSuperTightHalo2016Filter     ;
         bool Flag_BadPFMuonFilter                    ;
         bool Flag_eeBadScFilter                      ;
+        bool ecalBadCalibReducedMINIAODFilter        ;
 
         float dipho_mass                 ;
         float dipho_pt                   ;
@@ -229,6 +230,7 @@ class flashggAnalysisTreeFormatStd
             Flag_globalSuperTightHalo2016Filter     = false; 
             Flag_BadPFMuonFilter                    = false; 
             Flag_eeBadScFilter                      = false; 
+            ecalBadCalibReducedMINIAODFilter        = false; 
 
             dipho_mass                     = -999.;
             dipho_pt                       = -999.;
@@ -439,6 +441,7 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "EvtInfo.Flag_globalSuperTightHalo2016Filter"     , &Flag_globalSuperTightHalo2016Filter     , "EvtInfo.Flag_globalSuperTightHalo2016Filter/O"          );
             tree_->Branch( "EvtInfo.Flag_BadPFMuonFilter"                    , &Flag_BadPFMuonFilter                    , "EvtInfo.Flag_BadPFMuonFilter/O"                         );
             tree_->Branch( "EvtInfo.Flag_eeBadScFilter"                      , &Flag_eeBadScFilter                      , "EvtInfo.Flag_eeBadScFilter/O"                           );
+            tree_->Branch( "EvtInfo.ecalBadCalibReducedMINIAODFilter"        , &ecalBadCalibReducedMINIAODFilter        , "EvtInfo.ecalBadCalibReducedMINIAODFilter/O"             );
 
             tree_->Branch( "DiPhoInfo.mass"                    , &dipho_mass                   , "DiPhoInfo.mass/F"                 );
             tree_->Branch( "DiPhoInfo.pt"                      , &dipho_pt                     , "DiPhoInfo.pt/F"                   );

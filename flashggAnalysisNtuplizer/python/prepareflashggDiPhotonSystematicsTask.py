@@ -20,9 +20,15 @@ def getDiPhotonSystematicsList():
                 phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
                 for var in ["Rho","Phi"]:
                     phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
-        #variablesToUse.append("UnmatchedPUWeight%s01sigma[1,-999999.,999999.] := weight(\"UnmatchedPUWeight%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("JetBTagCutWeight%s01sigma[1,-999999.,999999.] := weight(\"JetBTagCutWeight%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("JetBTagReshapeWeight%s01sigma[1,-999999.,999999.] := weight(\"JetBTagReshapeWeight%s01sigma\")" % (direction,direction))
+
+        #variablesToUse.append("MvaLinearSyst%s01sigma[1,-999999.,999999.] := weight(\"MvaLinearSyst%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("LooseMvaSF%s01sigma[1,-999999.,999999.] := weight(\"LooseMvaSF%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("PreselSF%s01sigma[1,-999999.,999999.] := weight(\"PreselSF%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("electronVetoSF%s01sigma[1,-999999.,999999.] := weight(\"electronVetoSF%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("TriggerWeight%s01sigma[1,-999999.,999999.] := weight(\"TriggerWeight%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("FracRVWeight%s01sigma[1,-999999.,999999.] := weight(\"FracRVWeight%s01sigma\")" % (direction,direction))
+        #variablesToUse.append("FracRVNvtxWeight%s01sigma[1,-999999.,999999.] := weight(\"FracRVNvtxWeight%s01sigma\")" % (direction,direction))
+
     return phosystlabels
 
 def customizeSystematicsForMC(process):
@@ -74,22 +80,15 @@ def includeScale(process):
     process.flashggDiPhotonSystematics.SystMethods = customizeVPSetForData(process.flashggDiPhotonSystematics.SystMethods, photonScaleBinsData)
     process.flashggDiPhotonSystematics.SystMethods2D = customizeVPSetForData(process.flashggDiPhotonSystematics.SystMethods2D, photonScaleBinsData)
 
-def prepareflashggDiPhotonSystematicsTask(process, processType, doSystematics = False, year = '2016'):
+def prepareflashggDiPhotonSystematicsTask(process, processType, condition_dict, doSystematics = False):
 
     from flashgg.Systematics.SystematicsCustomize import useEGMTools
     process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
     process.flashggPreselectedDiPhotons.src = cms.InputTag('flashggDiPhotonSystematics')
 
-    if year == '2016':
-        process.load("flashgg.Systematics.flashggDiPhotonSystematics2016_cfi")
-        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2016_cfi")
-    elif year == '2017':
-        process.load("flashgg.Systematics.flashggDiPhotonSystematics2017_cfi")
-        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2017_cfi")
-    else:
-        process.load("flashgg.Systematics.flashggDiPhotonSystematics2018_cfi")
-        sysmodule = importlib.import_module("flashgg.Systematics.flashggDiPhotonSystematics2018_cfi")
-        
+    process.load("flashgg.Systematics." + condition_dict['flashggDiPhotonSystematics'])
+    sysmodule = importlib.import_module("flashgg.Systematics." + condition_dict['flashggDiPhotonSystematics'])
+
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleHighR9EB)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleLowR9EB)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.MCScaleHighR9EE)
@@ -125,7 +124,7 @@ def prepareflashggDiPhotonSystematicsTask(process, processType, doSystematics = 
 #        print pset
 #        print
 #    print 'point2'
-    
+
     SystTask = cms.Task(process.flashggDiPhotonSystematics)
 
     useEGMTools(process)

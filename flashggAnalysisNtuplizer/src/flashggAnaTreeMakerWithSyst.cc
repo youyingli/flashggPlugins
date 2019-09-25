@@ -111,13 +111,13 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
         dataformat.passTrigger = true;
     } else {
         const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerHandle );
-                                                                                                             
+
         map<string, int> triggerIndices;
         for( unsigned int i = 0; i < triggerNames.triggerNames().size(); i++ ) {
             std::string trimmedName = HLTConfigProvider::removeVersion( triggerNames.triggerName( i ) );
             triggerIndices.emplace(trimmedName, triggerNames.triggerIndex( triggerNames.triggerName( i ) ));
         }
-                                                                                                             
+
         for (const auto& it : triggerIndices) {
             if (triggerHandle->accept(it.second)) {
                 if (it.first == pathName_) {dataformat.passTrigger = true; break;}
@@ -399,12 +399,12 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.jets_pfDeepCSVJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepCSVJetTags:probc" ) );
             dataformat.jets_pfDeepCSVJetTags_probudsg     .emplace_back( it_jet->bDiscriminator( "pfDeepCSVJetTags:probudsg" ) );
 
-            dataformat.jets_pfDeepFlavourJetTags_probb        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probb" ) );
-            dataformat.jets_pfDeepFlavourJetTags_probbb       .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probbb" ) );
-            dataformat.jets_pfDeepFlavourJetTags_probc        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probc" ) );
-            dataformat.jets_pfDeepFlavourJetTags_probuds      .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probuds" ) );
-            dataformat.jets_pfDeepFlavourJetTags_probg        .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:probg" ) );
-            dataformat.jets_pfDeepFlavourJetTags_problepb     .emplace_back( it_jet->bDiscriminator( "pfDeepFlavourJetTags:problepb" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probb        .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:probb" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probbb       .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:probbb" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probc        .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:probc" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probuds      .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:probuds" ) );
+            dataformat.jets_pfDeepFlavourJetTags_probg        .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:probg" ) );
+            dataformat.jets_pfDeepFlavourJetTags_problepb     .emplace_back( it_jet->bDiscriminator( "mini_pfDeepFlavourJetTags:problepb" ) );
 	   
             auto jer = flashggAnalysisNtuplizer::JERUncertainty( *it_jet, *rho, iSetup );
             dataformat.jets_JECScale                      .emplace_back( it_jet->pt() / it_jet->correctedJet( "Uncorrected" ).pt() );
@@ -449,6 +449,7 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
         dataformat.met_Px                           = theMet->px();
         dataformat.met_Py                           = theMet->py();
         dataformat.met_SumET                        = theMet->sumEt();
+        dataformat.ecalBadCalibReducedMINIAODFilter = theMet->getPassEcalBadCalibFilter();
 
         if ( storeSyst_ && !isDiphoSystTree ) {
             dataformat.met_CorrPtShiftJetEnUp           = theMet->shiftedPt  ( pat::MET::JetEnUp           );
