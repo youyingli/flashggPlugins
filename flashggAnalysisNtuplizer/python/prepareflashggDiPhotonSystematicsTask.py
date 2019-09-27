@@ -116,7 +116,7 @@ def prepareflashggDiPhotonSystematicsTask(process, processType, condition_dict, 
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverEShift)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverESmearing)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVWeight)
-    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVNvtxWeight)
+    #process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVNvtxWeight)
 
 #    print 'point1'
 #    for pset in process.flashggDiPhotonSystematics.SystMethods:
