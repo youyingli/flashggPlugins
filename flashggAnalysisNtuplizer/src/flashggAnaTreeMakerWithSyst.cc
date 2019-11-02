@@ -1,4 +1,5 @@
 #include "DataFormats/Common/interface/Ptr.h"
+#include "FWCore/Utilities/interface/RegexMatch.h"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -29,7 +30,7 @@ flashggAnaTreeMakerWithSyst::flashggAnaTreeMakerWithSyst( const edm::InputTag &d
     triggerToken_         ( iC.consumes< edm::TriggerResults >                  ( iConfig.getParameter<InputTag> ( "TriggerTag"     ) ) ),
     mettriggerToken_      ( iC.consumes< edm::TriggerResults >                  ( iConfig.getParameter<InputTag> ( "MetTriggerTag"  ) ) )
 {
-    pathName_   = iConfig.getParameter<string>( "pathName" ) ;
+    pathNames_  = iConfig.getParameter<vector<string>>( "pathNames" ) ;
     isMiniAOD_  = iConfig.getParameter<bool>( "isMiniAOD" ) ;
     storeSyst_  = iConfig.getParameter<bool>( "storeSyst" ) ;
     doHTXS_     = iConfig.getParameter<bool>( "doHTXS" ) ;
@@ -112,15 +113,15 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
     } else {
         const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerHandle );
 
-        map<string, int> triggerIndices;
-        for( unsigned int i = 0; i < triggerNames.triggerNames().size(); i++ ) {
-            std::string trimmedName = HLTConfigProvider::removeVersion( triggerNames.triggerName( i ) );
-            triggerIndices.emplace(trimmedName, triggerNames.triggerIndex( triggerNames.triggerName( i ) ));
-        }
+        for (const auto& i_pathName : pathNames_) {
+            std::regex path_pattern (edm::glob2reg(i_pathName));
 
-        for (const auto& it : triggerIndices) {
-            if (triggerHandle->accept(it.second)) {
-                if (it.first == pathName_) {dataformat.passTrigger = true; break;}
+            for( unsigned int i = 0; i < triggerNames.triggerNames().size(); i++ ) {
+                string triggerName = triggerNames.triggerName( i );
+                int triggerIndex   = triggerNames.triggerIndex( triggerName );
+                if (triggerHandle->accept(triggerIndex)) {
+                    if (std::regex_match(triggerName, path_pattern)) {dataformat.passTrigger = true; break;}
+                }
             }
         }
     }
@@ -280,8 +281,8 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.elecs_EGMCutBasedIDTight        .emplace_back( it_elec->passTightId() );
             dataformat.elecs_passConvVeto              .emplace_back( it_elec->passConversionVeto() );
             dataformat.elecs_fggPhoVeto                .emplace_back( phoVeto( it_elec, diphoPtr, 0., 0.4, 0. ) );
-            dataformat.elecs_EnergyCorrFactor          .emplace_back( it_elec->userFloat("ecalTrkEnergyPostCorr") / it_elec->energy() );
-            dataformat.elecs_EnergyPostCorrErr         .emplace_back( it_elec->userFloat("ecalTrkEnergyErrPostCorr") );
+            //dataformat.elecs_EnergyCorrFactor          .emplace_back( it_elec->userFloat("ecalTrkEnergyPostCorr") / it_elec->energy() );
+            //dataformat.elecs_EnergyPostCorrErr         .emplace_back( it_elec->userFloat("ecalTrkEnergyErrPostCorr") );
             if ( storeSyst_ && !isDiphoSystTree ) {
                 dataformat.elecs_EnergyPostCorrScaleUp     .emplace_back( it_elec->userFloat("energyScaleUp") );
                 dataformat.elecs_EnergyPostCorrScaleDown   .emplace_back( it_elec->userFloat("energyScaleDown") );

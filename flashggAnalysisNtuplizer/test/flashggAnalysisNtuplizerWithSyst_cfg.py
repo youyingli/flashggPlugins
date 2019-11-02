@@ -29,10 +29,17 @@ options.register('processType',
                  )
 
 options.register('filename',
-                 "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",
+                 "",
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.string,
                  'filename'
+                 )
+
+options.register('isZeroVtx',
+                 True,
+                 opts.VarParsing.multiplicity.singleton,
+                 opts.VarParsing.varType.bool,
+                 'isZeroVtx'
                  )
 
 options.register('doHTXS',
@@ -51,14 +58,21 @@ options.register('doSystematics',
 
 options.parseArguments()
 
+metaConditionVersion = ''
+triggerkey = ''
+
 if options.year == '2016':
     metaConditionVersion = 'Era2016_RR-17Jul2018_v1.json'
+    triggerkey = '.*DoubleEG.*'
 elif options.year == '2017':
     metaConditionVersion = 'Era2017_RR-31Mar2018_v1.json'
+    triggerkey = '.*DoubleEG.*'
 elif options.year == '2018ABC':
     metaConditionVersion = 'Era2018_RR-17Sep2018_v1.json'
+    triggerkey = '.*EGamma.*2018.*'
 elif options.year == '2018D':
     metaConditionVersion = 'Era2018_Prompt_v1.json'
+    triggerkey = '.*EGamma.*2018.*'
 else:
     print '[ERROR] : Please input 2016, 2017, 2018ABC or 2018 D'
     sys.exit(0)
@@ -84,8 +98,8 @@ else:
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 100 )
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1 )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.source = cms.Source ("PoolSource",
         fileNames = cms.untracked.vstring(
@@ -109,7 +123,7 @@ process.TFileService = cms.Service("TFileService",
 
 # Modules builder
 #**************************************************************
-process.stdDiPhotonJetsSeq = cms.Sequence()
+process.stdDiPhotonSeq = cms.Sequence()
 
 #---------------------------------------------------------------------------------------------
 # Dump ntuples from MiniAOD not microAOD. Very Slow!  Default is False
@@ -122,17 +136,32 @@ if options.runMiniAOD:
 
     from flashggPlugins.flashggAnalysisNtuplizer.prepareflashggMicroAODTask import prepareflashggMicroAODTask
     MicroAODTask = prepareflashggMicroAODTask(process, options.processType, options.filename, options.doHTXS, options.year)
-    process.stdDiPhotonJetsSeq.associate( MicroAODTask )
+    process.stdDiPhotonSeq.associate( MicroAODTask )
 
 #---------------------------------------------------------------------------------------------
 # Diphoton Trigger setting
 # Data : Directly filter during processing 
 # MC   : Store in Ntuple
 #---------------------------------------------------------------------------------------------
-from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
-process.hltHighLevel = hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*",))
+hlt_paths = []
+for hlt in condition_dict["TriggerPaths"][triggerkey]:
+    hlt_paths.append(str(hlt))
+
 if options.processType == 'data':
-    process.stdDiPhotonJetsSeq += process.hltHighLevel
+    from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+    process.hltHighLevel = hltHighLevel.clone(HLTPaths = cms.vstring(hlt_paths))
+    process.stdDiPhotonSeq += process.hltHighLevel
+
+#---------------------------------------------------------------------------------------------
+# Use Zeroth vertex for diphoton
+#---------------------------------------------------------------------------------------------
+if options.isZeroVtx:
+    process.load("flashgg.MicroAOD.flashggDiPhotons_cfi")
+    process.flashggDiPhotons.whichVertex = cms.uint32(0)
+    process.flashggDiPhotons.useZerothVertexFromMicro = cms.bool(True)
+    process.flashggDiPhotons.vertexIdMVAweightfile = cms.FileInPath("flashgg/MicroAOD/data/TMVAClassification_BDTVtxId_SL_2016.xml")
+    process.flashggDiPhotons.vertexProbMVAweightfile = cms.FileInPath("flashgg/MicroAOD/data/TMVAClassification_BDTVtxProb_SL_2016.xml")
+    process.stdDiPhotonSeq += process.flashggDiPhotons
 
 #---------------------------------------------------------------------------------------------
 # DiPhoton preselection and MVA setting
@@ -177,7 +206,7 @@ process.basicSeq = cms.Sequence(process.flashggDifferentialPhoIdInputsCorrection
                                *process.flashggUnpackedJets
                                 )
 
-process.stdDiPhotonJetsSeq *= process.basicSeq
+process.stdDiPhotonSeq *= process.basicSeq
 
 #---------------------------------------------------------------------------------------------
 # Systematics setting
@@ -221,7 +250,7 @@ process.flashggNtuples = cms.EDAnalyzer('flashggAnaTreeMerge',
                                            PileUpTag               = cms.InputTag('slimmedAddPileupInfo'),
                                            TriggerTag              = cms.InputTag('TriggerResults::HLT'),
                                            MetTriggerTag           = cms.InputTag('TriggerResults::PAT'),
-                                           pathName                = cms.string("HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90"),
+                                           pathNames               = cms.vstring(hlt_paths),
                                            isMiniAOD               = cms.bool(options.runMiniAOD),
                                            storeSyst               = cms.bool(options.doSystematics),
                                            doHTXS                  = cms.bool(options.doHTXS),
@@ -229,7 +258,7 @@ process.flashggNtuples = cms.EDAnalyzer('flashggAnaTreeMerge',
                                        )
 )
 
-process.stdDiPhotonJetsSeq *= process.flashggNtuples
+process.stdDiPhotonSeq *= process.flashggNtuples
 
 #---------------------------------------------------------------------------------------------
 # MetFilter For Data is "RECO" lebal
@@ -240,4 +269,4 @@ if options.processType == 'data':
 #---------------------------------------------------------------------------------------------
 # Final Path to run
 #---------------------------------------------------------------------------------------------
-process.p = cms.Path(process.stdDiPhotonJetsSeq,diphotonSystematicsTask)
+process.p = cms.Path(process.stdDiPhotonSeq,diphotonSystematicsTask)

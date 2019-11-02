@@ -51,7 +51,7 @@ class flashggAnaTreeMakerWithSyst
         edm::EDGetTokenT<edm::TriggerResults>                   triggerToken_;
         edm::EDGetTokenT<edm::TriggerResults>                   mettriggerToken_;
         edm::EDGetTokenT<HTXS::HiggsClassification>             newHTXSToken_;
-        std::string pathName_;
+        std::vector<std::string> pathNames_;
         bool isMiniAOD_;
         bool storeSyst_;
         bool doHTXS_;
