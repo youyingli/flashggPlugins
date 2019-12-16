@@ -59,22 +59,28 @@ options.register('doSystematics',
 options.parseArguments()
 
 metaConditionVersion = ''
-triggerkey = ''
+hlt_paths = []
 
 if options.year == '2016':
     metaConditionVersion = 'Era2016_RR-17Jul2018_v1.json'
-    triggerkey = '.*DoubleEG.*'
+    hlt_paths = [
+            'HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90*'
+    ]
 elif options.year == '2017':
     metaConditionVersion = 'Era2017_RR-31Mar2018_v1.json'
-    triggerkey = '.*DoubleEG.*'
-elif options.year == '2018ABC':
+    hlt_paths = [
+            'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90*',
+            'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95*'
+    ]
+elif options.year == '2018':
     metaConditionVersion = 'Era2018_RR-17Sep2018_v1.json'
-    triggerkey = '.*EGamma.*2018.*'
-elif options.year == '2018D':
-    metaConditionVersion = 'Era2018_Prompt_v1.json'
-    triggerkey = '.*EGamma.*2018.*'
+    hlt_paths = [
+            'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90*',
+            'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95*',
+            'HLT_Ele*_WPTight_Gsf_v*'
+    ]
 else:
-    print '[ERROR] : Please input 2016, 2017, 2018ABC or 2018 D'
+    print '[ERROR] : Please input 2016, 2017, 2018'
     sys.exit(0)
 
 condition_dict = {}
@@ -143,10 +149,6 @@ if options.runMiniAOD:
 # Data : Directly filter during processing 
 # MC   : Store in Ntuple
 #---------------------------------------------------------------------------------------------
-hlt_paths = []
-for hlt in condition_dict["TriggerPaths"][triggerkey]:
-    hlt_paths.append(str(hlt))
-
 if options.processType == 'data':
     from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
     process.hltHighLevel = hltHighLevel.clone(HLTPaths = cms.vstring(hlt_paths))
