@@ -13,7 +13,6 @@
 #include "flashgg/DataFormats/interface/Electron.h"
 #include "flashgg/DataFormats/interface/Muon.h"
 #include "flashgg/DataFormats/interface/Met.h"
-#include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -50,11 +49,9 @@ class flashggAnaTreeMakerWithSyst
         edm::EDGetTokenT<edm::View<PileupSummaryInfo>>          pileUpToken_;
         edm::EDGetTokenT<edm::TriggerResults>                   triggerToken_;
         edm::EDGetTokenT<edm::TriggerResults>                   mettriggerToken_;
-        edm::EDGetTokenT<HTXS::HiggsClassification>             newHTXSToken_;
         std::vector<std::string> pathNames_;
         bool isMiniAOD_;
         bool storeSyst_;
-        bool doHTXS_;
     
         typedef std::vector<edm::Handle<edm::View<flashgg::Jet>>> JetCollectionVector;
         edm::Handle<edm::View<flashgg::DiPhotonCandidate> >   diphotons;
@@ -70,7 +67,6 @@ class flashggAnaTreeMakerWithSyst
         edm::Handle<edm::View< PileupSummaryInfo> >           pileupInfo;
         edm::Handle<edm::TriggerResults >                     triggerHandle;
         edm::Handle<edm::TriggerResults >                     mettriggerHandle;
-        edm::Handle<HTXS::HiggsClassification >               htxsClassification;
 };
 
 #endif

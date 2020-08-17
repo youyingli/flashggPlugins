@@ -1,7 +1,7 @@
 import os
 import FWCore.ParameterSet.Config as cms
 
-def includeflashggDiphoton(process, year):
+def includeflashggDiphoton(process, condition_dict):
     from flashgg.MicroAOD.flashggTkVtxMap_cfi import flashggVertexMapUnique,flashggVertexMapNonUnique
     setattr(process, 'flashggVertexMapUnique', flashggVertexMapUnique)
     setattr(process, 'flashggVertexMapNonUnique', flashggVertexMapNonUnique)
@@ -10,20 +10,13 @@ def includeflashggDiphoton(process, year):
     process.load("flashgg.MicroAOD.flashggRandomizedPhotonProducer_cff")
     process.load("flashgg.MicroAOD.flashggDiPhotons_cfi")
 
-    if year == '2016':
-        process.flashggPhotons.photonIdMVAweightfile_EB = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_barrel_Moriond2017_wRhoRew.weights.xml")
-        process.flashggPhotons.photonIdMVAweightfile_EE = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_endcap_Moriond2017_wRhoRew.weights.xml")
-        process.flashggPhotons.effAreasConfigFile = cms.FileInPath("RecoEgamma/PhotonIdentification/data/Spring16/effAreaPhotons_cone03_pfPhotons_90percentBased.txt")
-        process.flashggPhotons.is2017 = cms.bool(False)
+    process.flashggPhotons.photonIdMVAweightfile_EB = cms.FileInPath(str(condition_dict["flashggPhotons"]["photonIdMVAweightfile_EB"]))
+    process.flashggPhotons.photonIdMVAweightfile_EE = cms.FileInPath(str(condition_dict["flashggPhotons"]["photonIdMVAweightfile_EE"]))
+    process.flashggPhotons.effAreasConfigFile = cms.FileInPath(str(condition_dict["flashggPhotons"]["effAreasConfigFile"]))
+    process.flashggPhotons.is2017 = cms.bool(condition_dict["flashggPhotons"]["is2017"])
 
-    elif year == '2017' or year == '2018':
-        process.flashggPhotons.photonIdMVAweightfile_EB = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_94X_barrel_BDT_woisocorr.weights.xml")
-        process.flashggPhotons.photonIdMVAweightfile_EE = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_94X_endcap_BDT_woisocorr.weights.xml")
-        process.flashggPhotons.effAreasConfigFile = cms.FileInPath("RecoEgamma/PhotonIdentification/data/Fall17/effAreaPhotons_cone03_pfPhotons_90percentBased_TrueVtx.txt")
-        process.flashggPhotons.is2017 = cms.bool(True)
-
-    process.flashggDiPhotons.vertexIdMVAweightfile = cms.FileInPath("flashgg/MicroAOD/data/TMVAClassification_BDTVtxId_SL_2016.xml")
-    process.flashggDiPhotons.vertexProbMVAweightfile = cms.FileInPath("flashgg/MicroAOD/data/TMVAClassification_BDTVtxProb_SL_2016.xml")
+    process.flashggDiPhotons.vertexIdMVAweightfile = cms.FileInPath(str(condition_dict["flashggDiPhotons"]["vertexIdMVAweightfile"]))
+    process.flashggDiPhotons.vertexProbMVAweightfile = cms.FileInPath(str(condition_dict["flashggDiPhotons"]["vertexProbMVAweightfile"]))
 
 def includeflashggLepton(process):
     process.load("flashgg.MicroAOD.flashggElectrons_cfi")
@@ -125,44 +118,16 @@ def includeflashggGenInfo(process):
 def includeflashggPDFs(process):
     process.load("flashgg.MicroAOD.flashggPDFWeightObject_cfi")
 
-def includeHTXS(process):
-
-    process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-    process.rivetProducerHTXS = cms.EDProducer('HTXSRivetProducer',
-                                               HepMCCollection = cms.InputTag('myGenerator','unsmeared'),
-                                               LHERunInfo = cms.InputTag('externalLHEProducer'),
-                                               ProductionMode = cms.string('AUTO'),
-                                               )
-    process.mergedGenParticles = cms.EDProducer("MergedGenParticleProducer",
-                                                inputPruned = cms.InputTag("prunedGenParticles"),
-                                                inputPacked = cms.InputTag("packedGenParticles"),
-                                                )
-    process.myGenerator = cms.EDProducer("GenParticles2HepMCConverter",
-                                         genParticles = cms.InputTag("mergedGenParticles"),
-                                         genEventInfo = cms.InputTag("generator"),
-                                         signalParticlePdgIds = cms.vint32(25), ## for the Higgs analysis
-                                         )
-
 # signal specific setting
-def prepareSignal(process, filename, doHTXS, year):
+def prepareSignal(process, filename, year, condition_dict):
 
-    includeflashggDiphoton(process, year)
+    includeflashggDiphoton(process, condition_dict)
     includeflashggLepton(process)
     includeflashggJet(process, isMC = True)
     includePFMET(process, True, year)
     includeRunIIEleID(process)
     includeRunIIEGMPhoID(process)
     includeflashggGenInfo(process)
-    if doHTXS:
-        includeHTXS(process)
-    #includeflashggPDFs(process)
-
-    if filename.find("GluGlu") != -1:
-        process.rivetProducerHTXS.ProductionMode = "GGF"
-    if filename.find("VBF") != -1:
-        process.rivetProducerHTXS.ProductionMode = "VBF"
-    if filename.find("VH") != -1:
-        process.rivetProducerHTXS.ProductionMode = "AUTO"
 
     #if filename.find("THQ") != -1 or filename.find("THW") != -1:
     #    process.flashggPDFWeightObject.isStandardSample = False
@@ -171,9 +136,9 @@ def prepareSignal(process, filename, doHTXS, year):
     process.flashggGenPhotonsExtra.defaultType = 1
 
 # background specific setting
-def prepareBackground(process, filename, year):
+def prepareBackground(process, filename, year, condition_dict):
 
-    includeflashggDiphoton(process, year)
+    includeflashggDiphoton(process, condition_dict)
     includeflashggLepton(process)
     includeflashggJet(process, isMC = True)
     includePFMET(process, True, year)
@@ -185,9 +150,9 @@ def prepareBackground(process, filename, year):
         process.flashggGenPhotonsExtra.defaultType = 1
 
 # data specific setting
-def prepareData(process, year):
+def prepareData(process, year, condition_dict):
 
-    includeflashggDiphoton(process)
+    includeflashggDiphoton(process, condition_dict)
     includeflashggLepton(process)
     includeflashggJet(process, isMC = False)
     includePFMET(process, False, year)
@@ -201,14 +166,14 @@ def prepareData(process, year):
         delattr(process, "patJetPartons%i"%vtx)
         delattr(process, "patJetPartonMatchAK4PFCHSLeg%i"%vtx)
 
-def prepareflashggMicroAODTask(process, processType, filename, doHTXS = False, year = '2017'):
+def prepareflashggMicroAODTask(process, processType, filename, year = '2017', condition_dict):
 
     if processType == 'sig':
-        prepareSignal(process, filename, doHTXS, year)
+        prepareSignal(process, filename, year, condition_dict)
     elif processType == 'bkg':
-        prepareBackground(process, filename, year)
+        prepareBackground(process, filename, year, condition_dict)
     elif processType == 'data':
-        prepareData(process, year)
+        prepareData(process, year, condition_dict)
     else:
         raise Exception, "Please specify 'sig', 'bkg', 'data'"
 
@@ -216,6 +181,3 @@ def prepareflashggMicroAODTask(process, processType, filename, doHTXS = False, y
     getattr( process, 'MicroAODTask', cms.Task() ).add(*[getattr(process,prod) for prod in process.producers_()])
     getattr( process, 'MicroAODTask', cms.Task() ).add(*[getattr(process,filt) for filt in process.filters_()])
     return process.MicroAODTask
-
-#################  H T X S  #########################
-#process.rivetProducerHTXS.ProductionMode = "GGF", "VBF", "VH", "TTH", "TH"

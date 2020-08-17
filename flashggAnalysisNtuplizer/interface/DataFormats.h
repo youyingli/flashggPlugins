@@ -74,8 +74,6 @@ class flashggAnalysisTreeFormatStd
         float dipho_TriggerWeightDown    ; 
         float dipho_FracRVWeightUp       ; 
         float dipho_FracRVWeightDown     ; 
-        float dipho_FracRVNvtxWeightUp   ; 
-        float dipho_FracRVNvtxWeightDown ; 
 
         int elecs_size;
         std::vector<int>   elecs_Charge                 ; 
@@ -92,7 +90,6 @@ class flashggAnalysisTreeFormatStd
         std::vector<bool>  elecs_EGMCutBasedIDMedium    ; 
         std::vector<bool>  elecs_EGMCutBasedIDTight     ; 
         std::vector<bool>  elecs_passConvVeto           ;
-        std::vector<bool>  elecs_fggPhoVeto             ;
         std::vector<float> elecs_EnergyCorrFactor       ; 
         std::vector<float> elecs_EnergyPostCorrErr      ; 
         std::vector<float> elecs_EnergyPostCorrScaleUp  ; 
@@ -139,8 +136,6 @@ class flashggAnalysisTreeFormatStd
         std::vector<bool>  jets_passesPuJetIdMedium                           ;
         std::vector<bool>  jets_passesPuJetIdTight                            ;
         std::vector<bool>  jets_GenJetMatch                                   ;
-        std::vector<float> jets_pfCombinedInclusiveSecondaryVertexV2BJetTags  ; 
-        std::vector<float> jets_pfCombinedMVAV2BJetTags                       ; 
         std::vector<float> jets_pfDeepCSVJetTags_probb                        ; 
         std::vector<float> jets_pfDeepCSVJetTags_probbb                       ; 
         std::vector<float> jets_pfDeepCSVJetTags_probc                        ; 
@@ -169,6 +164,7 @@ class flashggAnalysisTreeFormatStd
         float met_Px                     ; 
         float met_Py                     ; 
         float met_SumET                  ; 
+        float met_Significance           ; 
         float met_CorrPtShiftJetEnUp     ; 
         float met_CorrPtShiftJetEnDown   ; 
         float met_CorrPtShiftJetResUp    ; 
@@ -282,8 +278,6 @@ class flashggAnalysisTreeFormatStd
             dipho_TriggerWeightDown        = -999.; 
             dipho_FracRVWeightUp           = -999.; 
             dipho_FracRVWeightDown         = -999.; 
-            dipho_FracRVNvtxWeightUp       = -999.; 
-            dipho_FracRVNvtxWeightDown     = -999.; 
 
             elecs_size                       = -999;
             elecs_Charge                     .clear(); 
@@ -300,7 +294,6 @@ class flashggAnalysisTreeFormatStd
             elecs_EGMCutBasedIDMedium        .clear(); 
             elecs_EGMCutBasedIDTight         .clear();
             elecs_passConvVeto               .clear();
-            elecs_fggPhoVeto                 .clear();
             elecs_EnergyCorrFactor           .clear(); 
             elecs_EnergyPostCorrErr          .clear(); 
             elecs_EnergyPostCorrScaleUp      .clear(); 
@@ -347,8 +340,6 @@ class flashggAnalysisTreeFormatStd
             jets_passesPuJetIdMedium                          .clear();
             jets_passesPuJetIdTight                           .clear();
             jets_GenJetMatch                                  .clear();
-            jets_pfCombinedInclusiveSecondaryVertexV2BJetTags .clear(); 
-            jets_pfCombinedMVAV2BJetTags                      .clear(); 
             jets_pfDeepCSVJetTags_probb                       .clear(); 
             jets_pfDeepCSVJetTags_probbb                      .clear(); 
             jets_pfDeepCSVJetTags_probc                       .clear(); 
@@ -377,6 +368,7 @@ class flashggAnalysisTreeFormatStd
             met_Px                      = -999.; 
             met_Py                      = -999.;
             met_SumET                   = -999.;
+            met_Significance            = -999.;
             met_CorrPtShiftJetEnUp      = -999.; 
             met_CorrPtShiftJetEnDown    = -999.; 
             met_CorrPtShiftJetResUp     = -999.; 
@@ -493,8 +485,6 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "DiPhoInfo.TriggerWeightDown"       , &dipho_TriggerWeightDown      , "DiPhoInfo.TriggerWeightDown/F"    );
             tree_->Branch( "DiPhoInfo.FracRVWeightUp"          , &dipho_FracRVWeightUp         , "DiPhoInfo.FracRVWeightUp/F"       );
             tree_->Branch( "DiPhoInfo.FracRVWeightDown"        , &dipho_FracRVWeightDown       , "DiPhoInfo.FracRVWeightDown/F"     );
-            tree_->Branch( "DiPhoInfo.FracRVNvtxWeightUp"      , &dipho_FracRVNvtxWeightUp     , "DiPhoInfo.FracRVNvtxWeightUp/F"   );
-            tree_->Branch( "DiPhoInfo.FracRVNvtxWeightDown"    , &dipho_FracRVNvtxWeightDown   , "DiPhoInfo.FracRVNvtxWeightDown/F" );
 
             tree_->Branch( "ElecInfo.Size"                        , &elecs_size                     , "ElecInfo.Size/I" );
             tree_->Branch( "ElecInfo.Charge"                      , &elecs_Charge                    );
@@ -511,7 +501,6 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "ElecInfo.EGMCutBasedIDMedium"         , &elecs_EGMCutBasedIDMedium       );
             tree_->Branch( "ElecInfo.EGMCutBasedIDTight"          , &elecs_EGMCutBasedIDTight        );
             tree_->Branch( "ElecInfo.passConvVeto"                , &elecs_passConvVeto              );
-            tree_->Branch( "ElecInfo.fggPhoVeto"                  , &elecs_fggPhoVeto                );
             tree_->Branch( "ElecInfo.EnergyCorrFactor"            , &elecs_EnergyCorrFactor          );
             tree_->Branch( "ElecInfo.EnergyPostCorrErr"           , &elecs_EnergyPostCorrErr         );
             tree_->Branch( "ElecInfo.EnergyPostCorrScaleUp"       , &elecs_EnergyPostCorrScaleUp     );
@@ -558,8 +547,6 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "JetInfo.passesPuJetIdMedium"                           , &jets_passesPuJetIdMedium                          );
             tree_->Branch( "JetInfo.passesPuJetIdTight"                            , &jets_passesPuJetIdTight                           );
             tree_->Branch( "JetInfo.GenJetMatch"                                   , &jets_GenJetMatch                                  );
-            tree_->Branch( "JetInfo.pfCombinedInclusiveSecondaryVertexV2BJetTags"  , &jets_pfCombinedInclusiveSecondaryVertexV2BJetTags );
-            tree_->Branch( "JetInfo.pfCombinedMVAV2BJetTags"                       , &jets_pfCombinedMVAV2BJetTags                      );
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probb"                        , &jets_pfDeepCSVJetTags_probb                       );
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probbb"                       , &jets_pfDeepCSVJetTags_probbb                      );
             tree_->Branch( "JetInfo.pfDeepCSVJetTags_probc"                        , &jets_pfDeepCSVJetTags_probc                       );
@@ -588,6 +575,7 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "MetInfo.Px"                       , &met_Px                        , "MetInfo.Px/F"                    );
             tree_->Branch( "MetInfo.Py"                       , &met_Py                        , "MetInfo.Py/F"                    );
             tree_->Branch( "MetInfo.SumET"                    , &met_SumET                     , "MetInfo.SumET/F"                 );
+            tree_->Branch( "MetInfo.Significance"             , &met_Significance              , "MetInfo.Significance/F"          );
             tree_->Branch( "MetInfo.CorrPtShiftJetEnUp"       , &met_CorrPtShiftJetEnUp        , "MetInfo.CorrPtShiftJetEnUp/F"    );
             tree_->Branch( "MetInfo.CorrPtShiftJetEnDown"     , &met_CorrPtShiftJetEnDown      , "MetInfo.CorrPtShiftJetEnDown/F"  );
             tree_->Branch( "MetInfo.CorrPtShiftJetResUp"      , &met_CorrPtShiftJetResUp       , "MetInfo.CorrPtShiftJetResUp/F"   );
