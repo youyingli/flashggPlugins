@@ -36,7 +36,7 @@ options.register('filename',
                  )
 
 options.register('isZeroVtx',
-                 False,
+                 True,
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.bool,
                  'isZeroVtx'
@@ -93,10 +93,10 @@ if options.processType == 'data':
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, condition_dict['globalTags']['MC'])
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 100 )
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 process.source = cms.Source ("PoolSource",
@@ -107,7 +107,25 @@ process.source = cms.Source ("PoolSource",
 #'/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIIFall17-3_1_0/3_1_0/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_PSWeights/RunIIFall17-3_1_0-3_1_0-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/180605_202241/0000/myMicroAODOutputFile_3.root'
 #'root://maite.iihe.ac.be:/pnfs/iihe/cms/store/user/kskovpen/tHGG/MicroAOD/2017_v20190402/RunIIFall18-4_0_0-44-g36175afd/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/2017_v20190402-RunIIFall18-4_0_0-44-g36175afd-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/190402_221745/0000/myMicroAODOutputFile_97.root'
 #'/store/user/spigazzi/flashgg/Era2017_RR-31Mar2018_v2/legacyRun2FullV1/VBFHToGG_M125_13TeV_amcatnlo_pythia8/Era2017_RR-31Mar2018_v2-legacyRun2FullV1-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/190703_112047/0000/myMicroAODOutputFile_37.root'
-'/store/mc/RunIIAutumn18MiniAOD/WHiggs0L1ToGG_M125_13TeV_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/70000/71195836-2315-3D43-B625-640E9B25DA8C.root'
+#'/store/mc/RunIIFall17MiniAODv2/VBFHToGG_M125_13TeV_amcatnlo_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/20000/D8383DFF-5C43-E811-8502-0CC47A7EEE1E.root'
+#'/store/mc/RunIIFall17MiniAODv2/ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/60000/F45BA187-3BCF-E811-BD77-001E675043AD.root'
+
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-T2HJ_aTleptonic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/100000/4618B5C9-28CE-E811-B630-FA163E1CB2EF.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/00000/14F730AC-0668-E811-BD99-0242AC130002.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/100000/06FAF1CE-04B4-E811-B9F2-FA163E669A98.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-TtoHJ_aTleptonic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/110000/0E025908-FAAE-E811-ABF5-FA163E0E3BB7.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/80000/004BCCB4-9AAE-E811-9CA9-FA163E9D9DB9.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/110000/14F4D9F8-93D3-E811-BB92-44A842B420FE.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/00000/02730D7B-C165-E811-9B03-3417EBE706C3.root'
+#'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-aTtoHJ_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/40000/02C17FFE-C063-E811-9FDD-F04DA27540CA.root'
+
+#'/store/mc/RunIIFall17MiniAODv2/ST_FCNC-TH_Thadronic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/00000/0287A7AD-45C9-E811-BA4A-0025905A60A0.root'
+#'/store/mc/RunIIFall17MiniAODv2/ST_FCNC-TH_Thadronic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/10000/02298966-92AE-E811-BB51-9CDC714AD5D0.root'
+#'/store/mc/RunIIFall17MiniAODv2/ST_FCNC-TH_Tleptonic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/10000/06852CD7-DDB7-E811-929E-001E67E59BE3.root'
+'/store/mc/RunIIFall17MiniAODv2/ST_FCNC-TH_Tleptonic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14-v1/10000/020C2E2A-42AE-E811-96D4-842B2B6F550D.root'
+
+#'/store/user/spigazzi/flashgg/Era2017_RR-31Mar2018_v2/legacyRun2FullV1/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/Era2017_RR-31Mar2018_v2-legacyRun2FullV1-v0-RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/190716_170206/0002/myMicroAODOutputFile_2069.root'
+#'/store/mc/RunIIAutumn18MiniAOD/WHiggs0L1ToGG_M125_13TeV_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/70000/71195836-2315-3D43-B625-640E9B25DA8C.root'
 #'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-TtoHJ_aThadronic_HToaa_eta_hct-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/80000/BC014599-986D-E811-9493-1866DA85D72E.root'
 #'/store/mc/RunIIFall17MiniAODv2/TT_FCNC-aTtoHJ_Thadronic_HToaa_eta_hut-MadGraph5-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/50000/FA62F95C-CAAB-E811-BF6F-001E67E713A4.root'
 #'/store/mc/RunIIFall17MiniAODv2/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/EEC90FD7-A242-E811-AA78-EC0D9A8225FE.root'
@@ -246,6 +264,7 @@ process.flashggNtuples = cms.EDAnalyzer('flashggAnaTreeMerge',
                                            PileUpTag               = cms.InputTag('slimmedAddPileupInfo'),
                                            TriggerTag              = cms.InputTag('TriggerResults::HLT'),
                                            MetTriggerTag           = cms.InputTag('TriggerResults::PAT'),
+                                           PDFWeightTag            = cms.InputTag('flashggPDFWeightObject'),
                                            pathNames               = cms.vstring(hlt_paths),
                                            isMiniAOD               = cms.bool(options.runMiniAOD),
                                            storeSyst               = cms.bool(options.doSystematics)

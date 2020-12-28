@@ -10,6 +10,7 @@ class flashggAnalysisTreeFormatStd
 
         float NPu                                    ;
         int NVtx                                     ;
+        int EvtNo                                    ;
         bool passTrigger                             ;
         float genweight                              ;
         float Rho                                    ;
@@ -23,6 +24,9 @@ class flashggAnalysisTreeFormatStd
         bool Flag_BadPFMuonFilter                    ;
         bool Flag_eeBadScFilter                      ;
         bool ecalBadCalibReducedMINIAODFilter        ;
+        std::vector<float> pdf_Weights               ; 
+        std::vector<float> alphas_Weights            ; 
+        std::vector<float> qcdScale_Weights          ; 
 
         float dipho_mass                 ;
         float dipho_pt                   ;
@@ -62,8 +66,6 @@ class flashggAnalysisTreeFormatStd
         float dipho_SelectedVz           ;
         float dipho_GenVz                ;
         float dipho_centralWeight        ; 
-        float dipho_MvaLinearSystUp      ; 
-        float dipho_MvaLinearSystDown    ; 
         float dipho_LooseMvaSFUp         ; 
         float dipho_LooseMvaSFDown       ; 
         float dipho_PreselSFUp           ; 
@@ -89,6 +91,8 @@ class flashggAnalysisTreeFormatStd
         std::vector<bool>  elecs_EGMCutBasedIDLoose     ; 
         std::vector<bool>  elecs_EGMCutBasedIDMedium    ; 
         std::vector<bool>  elecs_EGMCutBasedIDTight     ; 
+        std::vector<bool>  elecs_EGMMVAIDMedium         ; 
+        std::vector<bool>  elecs_EGMMVAIDTight          ; 
         std::vector<bool>  elecs_passConvVeto           ;
         std::vector<float> elecs_EnergyCorrFactor       ; 
         std::vector<float> elecs_EnergyPostCorrErr      ; 
@@ -214,6 +218,7 @@ class flashggAnalysisTreeFormatStd
 
             NPu                                     = -999.;
             NVtx                                    = -999;
+            EvtNo                                   = -999;
             passTrigger                             = false;
             genweight                               = 1.;
             Rho                                     = -999.;
@@ -226,7 +231,10 @@ class flashggAnalysisTreeFormatStd
             Flag_globalSuperTightHalo2016Filter     = false; 
             Flag_BadPFMuonFilter                    = false; 
             Flag_eeBadScFilter                      = false; 
-            ecalBadCalibReducedMINIAODFilter        = false; 
+            ecalBadCalibReducedMINIAODFilter        = false;
+            pdf_Weights       .clear(); 
+            alphas_Weights    .clear(); 
+            qcdScale_Weights  .clear(); 
 
             dipho_mass                     = -999.;
             dipho_pt                       = -999.;
@@ -266,8 +274,6 @@ class flashggAnalysisTreeFormatStd
             dipho_SelectedVz               = -999.;
             dipho_GenVz                    = -999.;
             dipho_centralWeight            = 1.;
-            dipho_MvaLinearSystUp          = -999.; 
-            dipho_MvaLinearSystDown        = -999.; 
             dipho_LooseMvaSFUp             = -999.; 
             dipho_LooseMvaSFDown           = -999.; 
             dipho_PreselSFUp               = -999.; 
@@ -293,6 +299,8 @@ class flashggAnalysisTreeFormatStd
             elecs_EGMCutBasedIDLoose         .clear(); 
             elecs_EGMCutBasedIDMedium        .clear(); 
             elecs_EGMCutBasedIDTight         .clear();
+            elecs_EGMMVAIDMedium             .clear();
+            elecs_EGMMVAIDTight              .clear();
             elecs_passConvVeto               .clear();
             elecs_EnergyCorrFactor           .clear(); 
             elecs_EnergyPostCorrErr          .clear(); 
@@ -421,6 +429,7 @@ class flashggAnalysisTreeFormatStd
 
             tree_->Branch( "EvtInfo.NPu"                                     , &NPu                                     , "EvtInfo.NPu/F"            );
             tree_->Branch( "EvtInfo.NVtx"                                    , &NVtx                                    , "EvtInfo.NVtx/I"           );
+            tree_->Branch( "EvtInfo.EvtNo"                                   , &EvtNo                                   , "EvtInfo.EvtNo/I"          );
             tree_->Branch( "EvtInfo.passTrigger"                             , &passTrigger                             , "EvtInfo.passTrigger/O"    );
             tree_->Branch( "EvtInfo.genweight"                               , &genweight                               , "EvtInfo.genweight/F"      );
             tree_->Branch( "EvtInfo.Rho"                                     , &Rho                                     , "EvtInfo.Rho/F"            );
@@ -434,6 +443,9 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "EvtInfo.Flag_BadPFMuonFilter"                    , &Flag_BadPFMuonFilter                    , "EvtInfo.Flag_BadPFMuonFilter/O"                         );
             tree_->Branch( "EvtInfo.Flag_eeBadScFilter"                      , &Flag_eeBadScFilter                      , "EvtInfo.Flag_eeBadScFilter/O"                           );
             tree_->Branch( "EvtInfo.ecalBadCalibReducedMINIAODFilter"        , &ecalBadCalibReducedMINIAODFilter        , "EvtInfo.ecalBadCalibReducedMINIAODFilter/O"             );
+            tree_->Branch( "EvtInfo.pdf_Weights"               , &pdf_Weights           );
+            tree_->Branch( "EvtInfo.alphas_Weights"            , &alphas_Weights        );
+            tree_->Branch( "EvtInfo.qcdScale_Weights"          , &qcdScale_Weights      );
 
             tree_->Branch( "DiPhoInfo.mass"                    , &dipho_mass                   , "DiPhoInfo.mass/F"                 );
             tree_->Branch( "DiPhoInfo.pt"                      , &dipho_pt                     , "DiPhoInfo.pt/F"                   );
@@ -473,8 +485,6 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "DiPhoInfo.SelectedVz"              , &dipho_SelectedVz             , "DiPhoInfo.SelectedVz/F"           );
             tree_->Branch( "DiPhoInfo.GenVz"                   , &dipho_GenVz                  , "DiPhoInfo.GenVz/F"                );
             tree_->Branch( "DiPhoInfo.centralWeight"           , &dipho_centralWeight          , "DiPhoInfo.centralWeight/F"        );
-            tree_->Branch( "DiPhoInfo.MvaLinearSystUp"         , &dipho_MvaLinearSystUp        , "DiPhoInfo.MvaLinearSystUp/F"      );
-            tree_->Branch( "DiPhoInfo.MvaLinearSystDown"       , &dipho_MvaLinearSystDown      , "DiPhoInfo.MvaLinearSystDown/F"    );
             tree_->Branch( "DiPhoInfo.LooseMvaSFUp"            , &dipho_LooseMvaSFUp           , "DiPhoInfo.LooseMvaSFUp/F"         );
             tree_->Branch( "DiPhoInfo.LooseMvaSFDown"          , &dipho_LooseMvaSFDown         , "DiPhoInfo.LooseMvaSFDown/F"       );
             tree_->Branch( "DiPhoInfo.PreselSFUp"              , &dipho_PreselSFUp             , "DiPhoInfo.PreselSFUp/F"           );
@@ -500,6 +510,8 @@ class flashggAnalysisTreeFormatStd
             tree_->Branch( "ElecInfo.EGMCutBasedIDLoose"          , &elecs_EGMCutBasedIDLoose        );
             tree_->Branch( "ElecInfo.EGMCutBasedIDMedium"         , &elecs_EGMCutBasedIDMedium       );
             tree_->Branch( "ElecInfo.EGMCutBasedIDTight"          , &elecs_EGMCutBasedIDTight        );
+            tree_->Branch( "ElecInfo.EGMMVAIDMedium"              , &elecs_EGMMVAIDMedium            );
+            tree_->Branch( "ElecInfo.EGMMVAIDTight"               , &elecs_EGMMVAIDTight             );
             tree_->Branch( "ElecInfo.passConvVeto"                , &elecs_passConvVeto              );
             tree_->Branch( "ElecInfo.EnergyCorrFactor"            , &elecs_EnergyCorrFactor          );
             tree_->Branch( "ElecInfo.EnergyPostCorrErr"           , &elecs_EnergyPostCorrErr         );

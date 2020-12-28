@@ -7,6 +7,7 @@
 
 #include "flashggPlugins/flashggAnalysisNtuplizer/interface/flashggAnaTreeMakerWithSyst.h"
 #include "flashggPlugins/flashggAnalysisNtuplizer/interface/JetSystematics.h"
+#include "flashggPlugins/flashggAnalysisNtuplizer/interface/PDFWeightsProducer.h"
 
 using namespace std;
 using namespace edm;
@@ -27,7 +28,8 @@ flashggAnaTreeMakerWithSyst::flashggAnaTreeMakerWithSyst( const edm::InputTag &d
     genEventInfoToken_    ( iC.consumes< GenEventInfoProduct >                  ( iConfig.getParameter<InputTag> ( "GenEventInfo"   ) ) ),
     pileUpToken_          ( iC.consumes< View<PileupSummaryInfo > >             ( iConfig.getParameter<InputTag> ( "PileUpTag"      ) ) ),
     triggerToken_         ( iC.consumes< edm::TriggerResults >                  ( iConfig.getParameter<InputTag> ( "TriggerTag"     ) ) ),
-    mettriggerToken_      ( iC.consumes< edm::TriggerResults >                  ( iConfig.getParameter<InputTag> ( "MetTriggerTag"  ) ) )
+    mettriggerToken_      ( iC.consumes< edm::TriggerResults >                  ( iConfig.getParameter<InputTag> ( "MetTriggerTag"  ) ) ),
+    pdfWeightToken_       ( iC.consumes< vector<flashgg::PDFWeightObject> >     ( iConfig.getParameter<InputTag> ( "PDFWeightTag"   ) ) )
 {
     pathNames_  = iConfig.getParameter<vector<string>>( "pathNames" ) ;
     isMiniAOD_  = iConfig.getParameter<bool>( "isMiniAOD" ) ;
@@ -88,6 +90,7 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
     iEvent.getByToken( pileUpToken_       ,     pileupInfo          );
     iEvent.getByToken( triggerToken_      ,     triggerHandle       );
     iEvent.getByToken( mettriggerToken_   ,     mettriggerHandle    );
+    iEvent.getByToken( pdfWeightToken_    ,     pdfWeightHandle     );
 
     // dataformat Initialzation
     // ---------------------------------------------------------------------------------------------------------
@@ -98,6 +101,7 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
     dataformat.Rho     = *rho;
     dataformat.PVz     = primaryVertices->ptrAt(0)->z();
     dataformat.NVtx    = primaryVertices->size();
+    dataformat.EvtNo   = iEvent.id().event();
     if( recoBeamSpotHandle.isValid() ) {
         dataformat.BSsigmaz = recoBeamSpotHandle->sigmaZ();
     }
@@ -183,6 +187,10 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
 
             dataformat.GenParticles_size = NGenParticles;
 
+            //Store PDF uncertainties
+            if (pdfWeightHandle.isValid() && storeSyst_)
+                flashggAnalysisNtuplizer::PDFWeightsProducer ( *pdfWeightHandle, dataformat, dataformat.genweight );
+
         }
     }
 
@@ -235,8 +243,6 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
 
         dataformat.dipho_centralWeight        = diphoPtr->centralWeight();
         if ( storeSyst_ && !isDiphoSystTree ) {
-            dataformat.dipho_MvaLinearSystUp      = diphoPtr->weight("MvaLinearSystUp01sigma");
-            dataformat.dipho_MvaLinearSystDown    = diphoPtr->weight("MvaLinearSystDown01sigma");
             dataformat.dipho_LooseMvaSFUp         = diphoPtr->weight("LooseMvaSFUp01sigma");
             dataformat.dipho_LooseMvaSFDown       = diphoPtr->weight("LooseMvaSFDown01sigma");
             dataformat.dipho_PreselSFUp           = diphoPtr->weight("PreselSFUp01sigma");
@@ -245,8 +251,8 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.dipho_electronVetoSFDown   = diphoPtr->weight("electronVetoSFDown01sigma");
             dataformat.dipho_TriggerWeightUp      = diphoPtr->weight("TriggerWeightUp01sigma");
             dataformat.dipho_TriggerWeightDown    = diphoPtr->weight("TriggerWeightDown01sigma");
-            dataformat.dipho_FracRVWeightUp       = diphoPtr->weight("FracRVWeightUp01sigma");
-            dataformat.dipho_FracRVWeightDown     = diphoPtr->weight("FracRVWeightDown01sigma");
+            //dataformat.dipho_FracRVWeightUp       = diphoPtr->weight("FracRVWeightUp01sigma");
+            //dataformat.dipho_FracRVWeightDown     = diphoPtr->weight("FracRVWeightDown01sigma");
         }
 
         // Electron information
@@ -265,10 +271,13 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
             dataformat.elecs_EGMCutBasedIDLoose        .emplace_back( it_elec->passLooseId() );
             dataformat.elecs_EGMCutBasedIDMedium       .emplace_back( it_elec->passMediumId() );
             dataformat.elecs_EGMCutBasedIDTight        .emplace_back( it_elec->passTightId() );
+            dataformat.elecs_EGMMVAIDMedium            .emplace_back( it_elec->passMVAMediumId() );
+            dataformat.elecs_EGMMVAIDTight             .emplace_back( it_elec->passMVATightId() );
             dataformat.elecs_passConvVeto              .emplace_back( it_elec->passConversionVeto() );
-            //dataformat.elecs_EnergyCorrFactor          .emplace_back( it_elec->userFloat("ecalTrkEnergyPostCorr") / it_elec->energy() );
-            //dataformat.elecs_EnergyPostCorrErr         .emplace_back( it_elec->userFloat("ecalTrkEnergyErrPostCorr") );
-            if ( storeSyst_ && !isDiphoSystTree ) {
+
+            if ( it_elec->hasUserFloat("ecalTrkEnergyPostCorr") ) {
+                dataformat.elecs_EnergyCorrFactor          .emplace_back( it_elec->userFloat("ecalTrkEnergyPostCorr") / it_elec->energy() );
+                dataformat.elecs_EnergyPostCorrErr         .emplace_back( it_elec->userFloat("ecalTrkEnergyErrPostCorr") );
                 dataformat.elecs_EnergyPostCorrScaleUp     .emplace_back( it_elec->userFloat("energyScaleUp") );
                 dataformat.elecs_EnergyPostCorrScaleDown   .emplace_back( it_elec->userFloat("energyScaleDown") );
                 dataformat.elecs_EnergyPostCorrSmearUp     .emplace_back( it_elec->userFloat("energySigmaUp") );
@@ -398,6 +407,9 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
                 dataformat.jets_JERDown                   .emplace_back( std::get<2>(jer) );
             }
 
+            dataformat.jets_GenFlavor         .emplace_back( it_jet->partonFlavour() );
+            dataformat.jets_GenHadronFlavor   .emplace_back( it_jet->hadronFlavour() );
+
             if ( isMiniAOD_ && !iEvent.isRealData() && !isDiphoSystTree ) {
                 const reco::GenParticle* parton = it_jet->genParton();
                 if ( parton != nullptr ) {
@@ -406,16 +418,12 @@ flashggAnaTreeMakerWithSyst::Analyze( const edm::Event &iEvent, const edm::Event
                     dataformat.jets_GenEta            .emplace_back( parton->eta() );
                     dataformat.jets_GenPhi            .emplace_back( parton->phi() );
                     dataformat.jets_GenPdgID          .emplace_back( parton->pdgId() );
-                    dataformat.jets_GenFlavor         .emplace_back( it_jet->partonFlavour() );
-                    dataformat.jets_GenHadronFlavor   .emplace_back( it_jet->hadronFlavour() );
                 } else {
                     dataformat.jets_GenPartonMatch    .emplace_back( false );
                     dataformat.jets_GenPt             .emplace_back( -999. );
                     dataformat.jets_GenEta            .emplace_back( -999. );
                     dataformat.jets_GenPhi            .emplace_back( -999. );
                     dataformat.jets_GenPdgID          .emplace_back( 0 );
-                    dataformat.jets_GenFlavor         .emplace_back( 0 );
-                    dataformat.jets_GenHadronFlavor   .emplace_back( 0 );
                 }
             }
 

@@ -13,6 +13,7 @@
 #include "flashgg/DataFormats/interface/Electron.h"
 #include "flashgg/DataFormats/interface/Muon.h"
 #include "flashgg/DataFormats/interface/Met.h"
+#include "flashgg/DataFormats/interface/PDFWeightObject.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -49,6 +50,7 @@ class flashggAnaTreeMakerWithSyst
         edm::EDGetTokenT<edm::View<PileupSummaryInfo>>          pileUpToken_;
         edm::EDGetTokenT<edm::TriggerResults>                   triggerToken_;
         edm::EDGetTokenT<edm::TriggerResults>                   mettriggerToken_;
+        edm::EDGetTokenT<std::vector<flashgg::PDFWeightObject>> pdfWeightToken_;
         std::vector<std::string> pathNames_;
         bool isMiniAOD_;
         bool storeSyst_;
@@ -67,6 +69,7 @@ class flashggAnaTreeMakerWithSyst
         edm::Handle<edm::View< PileupSummaryInfo> >           pileupInfo;
         edm::Handle<edm::TriggerResults >                     triggerHandle;
         edm::Handle<edm::TriggerResults >                     mettriggerHandle;
+        edm::Handle<std::vector<flashgg::PDFWeightObject> >   pdfWeightHandle;
 };
 
 #endif

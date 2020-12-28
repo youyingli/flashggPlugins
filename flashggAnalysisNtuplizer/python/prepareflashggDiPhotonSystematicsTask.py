@@ -21,14 +21,6 @@ def getDiPhotonSystematicsList():
                 for var in ["Rho","Phi"]:
                     phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
 
-        #variablesToUse.append("MvaLinearSyst%s01sigma[1,-999999.,999999.] := weight(\"MvaLinearSyst%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("LooseMvaSF%s01sigma[1,-999999.,999999.] := weight(\"LooseMvaSF%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("PreselSF%s01sigma[1,-999999.,999999.] := weight(\"PreselSF%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("electronVetoSF%s01sigma[1,-999999.,999999.] := weight(\"electronVetoSF%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("TriggerWeight%s01sigma[1,-999999.,999999.] := weight(\"TriggerWeight%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("FracRVWeight%s01sigma[1,-999999.,999999.] := weight(\"FracRVWeight%s01sigma\")" % (direction,direction))
-        #variablesToUse.append("FracRVNvtxWeight%s01sigma[1,-999999.,999999.] := weight(\"FracRVNvtxWeight%s01sigma\")" % (direction,direction))
-
     return phosystlabels
 
 def customizeSystematicsForMC(process):
@@ -115,7 +107,7 @@ def prepareflashggDiPhotonSystematicsTask(process, processType, condition_dict, 
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.LooseMvaSF)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverEShift)
     process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.SigmaEOverESmearing)
-    process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVWeight)
+    #process.flashggDiPhotonSystematics.SystMethods.append(sysmodule.FracRVWeight)
 
 #    print 'point1'
 #    for pset in process.flashggDiPhotonSystematics.SystMethods:

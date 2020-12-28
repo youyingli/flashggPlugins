@@ -115,8 +115,10 @@ def includeRunIIEGMPhoID(process):
 def includeflashggGenInfo(process):
     process.load("flashgg.MicroAOD.flashggMicroAODGenSequence_cff")
 
-def includeflashggPDFs(process):
+def includeflashggPDFs(process, condition_dict):
     process.load("flashgg.MicroAOD.flashggPDFWeightObject_cfi")
+    if "mc2hessianCSV" in condition_dict.keys() and condition_dict["mc2hessianCSV"] != "":
+        setattr(process.flashggPDFWeightObject, "mc2hessianCSV", str(condition_dict["mc2hessianCSV"]))
 
 # signal specific setting
 def prepareSignal(process, filename, year, condition_dict):
@@ -128,6 +130,9 @@ def prepareSignal(process, filename, year, condition_dict):
     includeRunIIEleID(process)
     includeRunIIEGMPhoID(process)
     includeflashggGenInfo(process)
+
+    if filename.find("TT_FCNC") == -1:
+        includeflashggPDFs(process, condition_dict)
 
     #if filename.find("THQ") != -1 or filename.find("THW") != -1:
     #    process.flashggPDFWeightObject.isStandardSample = False
@@ -166,7 +171,7 @@ def prepareData(process, year, condition_dict):
         delattr(process, "patJetPartons%i"%vtx)
         delattr(process, "patJetPartonMatchAK4PFCHSLeg%i"%vtx)
 
-def prepareflashggMicroAODTask(process, processType, filename, year = '2017', condition_dict):
+def prepareflashggMicroAODTask(process, processType, filename, year, condition_dict):
 
     if processType == 'sig':
         prepareSignal(process, filename, year, condition_dict)
